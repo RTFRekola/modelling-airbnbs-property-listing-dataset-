@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Mon 12 Jun 2023 at 18:36 UT
-Last modified on Mon 12 Jun 2023 at 18:36 UT 
+Last modified on Mon 26 Jun 2023 at 19:48 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -11,6 +11,7 @@ Modelling Airbnb's Property Listing Dataset
 '''
 
 import pandas as pd
+import numpy as np
 
 
 # ==============================================
@@ -19,17 +20,49 @@ import pandas as pd
 
 def clean_tabular_data():
 
+    '''
+    Load a csv file, fix the data, and save the clean data as a new file.
+    '''
+
+    def fix_shifted_rows(df):
+
+        '''
+        Move shifted data to correct place
+        '''
+
+        ''' The following does not work
+        def shifter(row):
+            return np.hstack((np.delete(np.array(row), [6]), [np.nan]))
+        # end shifter
+
+        df.iloc[19] = df.iloc[19].fillna(1)
+        mask = df['url'] == '46'
+        df.loc[mask, :] = df.loc[mask, :].apply(shifter, axis=1)
+        df = df.drop([19], axis=1)
+        '''
+        ''' The following does not work either
+        mask = df['url'] == '46'
+        df.loc[mask, 6:18] = df.loc[mask, 7:19].shift(periods = -1, axis = 1)
+        '''
+
+        # Just removing row 588 instead, at least for now
+        df = df.drop(labels=586, axis=0)
+        return df
+    # end fix_shifted_rows
+
+
     def remove_rows_with_missing_ratings(df):
 
         '''
         Remove rows with missing values in ratings columns.
         '''
 
-        df = df.dropna(subset=['Cleanliness_rate'])
-        df = df.dropna(subset=['Accuracy_rate'])
-        df = df.dropna(subset=['Location_rate'])
-        df = df.dropna(subset=['Check-in_rate'])
-        df = df.dropna(subset=['Value_rate'])
+        df = df.dropna(subset=['Cleanliness_rating'])
+        df = df.dropna(subset=['Accuracy_rating'])
+        df = df.dropna(subset=['Communication_rating'])
+        df = df.dropna(subset=['Location_rating'])
+        df = df.dropna(subset=['Check-in_rating'])
+        df = df.dropna(subset=['Value_rating'])
         return df
     # end remove_rows_with_missing_ratings
 
@@ -42,17 +75,22 @@ def clean_tabular_data():
         Merge list items into the same string. 
         '''
 
-        def remove_empty_items_and_join(description_list):
-            description_list = [x for x in description_list if x]
-            " ".join(description_list)
-            return description_list
-        # end remove_empty_items_and_join
+        def make_corrections(description_in):
+            description_mid1 = description_in.replace("'About this space', ", 
+                                                      "")
+            description_mid2 = description_mid1.replace("', '", "")
+            description_mid3 = description_mid2.replace('\\n', ' ')
+            description_mid4 = description_mid3.strip()
+            description_out = (description_mid4.replace("['", "").
+                               replace('["', '').replace('"]', '').
+                               replace("']", ""))
+            return description_out
+        # make_corrections
 
         df = df.dropna(subset=['Description'])
-        df['Description'] = df['Description'].replace(r'About this space',
-                                                      '', regex=True)
-        df['Description'] = df.apply(lambda row: remove_empty_items_and_join(row['Description']), axis=1)
-        df['Description'] = df['Description'].replace(r'\n',' ', regex=True)
+        df['Description'] = df.apply(lambda row: 
+                                     make_corrections(row['Description']), 
+                                     axis=1)
         return df
     # end combine_description_strings
 
@@ -80,6 +118,9 @@ def clean_tabular_data():
         # Load data from a CSV file into a Pandas DataFrame
         df = pd.read_csv("../airbnb-local/tabular_data/listing.csv")
 
+        # Fix shifted rows
+        df = fix_shifted_rows(df)
+
         # Remove rows with missing rating values
         df = remove_rows_with_missing_ratings(df)
 
@@ -93,5 +134,43 @@ def clean_tabular_data():
         df.to_csv("../airbnb-local/tabular_data/clean_tabular_data.csv", 
                   encoding='utf-8', index=False)
     # end if
+    return df
 
-    # end clean_tabular_data
+# end clean_tabular_data
+
+
+def load_airbnb(df):
+
+    '''
+    Return all numerical values, or features, as a pandas dataframe and their
+    headers, or labels, as a list in the tuple format (features, labels)
+    '''
+
+    df2 = df[["guests", "beds", "bathrooms", "Price_Night", 
+              "Cleanliness_rating", "Accuracy_rating", 
+              "Communication_rating", "Location_rating", 
+              "Check-in_rating", "Value_rating", 
+              "amenities_count", "bedrooms"]]
+    df2.columns = ['', '', '', '', '', '', '', '', '', '', '', '']
+    # df2 = df2.iloc[0:, :]
+    # df2.columns = range(df.shape[1]) 
+    # df2 = df2.drop(df2.index[0])
+    labels_list = ["guests", "beds", "bathrooms", "Price_Night", 
+                   "Cleanliness_rating", "Accuracy_rating", 
+                   "Communication_rating", "Location_rating", 
+                   "Check-in_rating", "Value_rating", 
+                   "amenities_count", "bedrooms"]
+    features_labels_tuple = (df2, labels_list)
+    return features_labels_tuple
+# end load_airbnb
+
+
+# ==============================================
+# ===   Main programme   =======================
+# ==============================================
+
+df = clean_tabular_data()
+features_labels_tuple = load_airbnb(df)
+print(features_labels_tuple)
+
+# end programme
