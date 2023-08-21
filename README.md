@@ -1,6 +1,11 @@
 # Modelling Airbnb's Property Listing Dataset
 Build a framework to systematically train, tune, and evaluate models on several tasks that are tackled by the Airbnb team. 
 
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Set Up the Environment](#section-1)
+3. [Data Preparation](#section-2)
+
 ## Set Up the Environment
 Created a new repository in GitHub called modelling-airbnbs-property-listing-dataset and added the URL for the remote repository where to push the local repository.
 
