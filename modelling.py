@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Tue 21 Oct 2023 at 16:44 UT 
+Last modified on Thu 26 Oct 2023 at 14:15 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -10,23 +10,30 @@ Modelling Airbnb's Property Listing Dataset
 ===========================================
 '''
 
-from tabular_data import load_airbnb
+import joblib
+import json
 import numpy as np
+import os
 import pandas as pd
+
 import inspect
 from inspect import signature
-import sklearn
+
+#import sklearn
 from sklearn import datasets, model_selection
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import SGDRegressor
-from sklearn.model_selection import ParameterGrid
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import mean_squared_error
 from sklearn.metrics import classification_report
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import ParameterGrid
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import scale
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeRegressor
+from tabular_data import load_airbnb
 
 
 # ==============================================
@@ -36,8 +43,28 @@ from sklearn.preprocessing import scale
 def custom_tune_regression_model_hyperparameters(model_class, training_set, validation_set, test_set, hyperparameters):
 
     '''
-    This function performs a grid search over a range of hyperparameter
-    values. 
+    This function performs a grid search over a range of hyperparameter values. 
+
+    Variables: 
+    - hyperparameters = set of hyperparameters to test, input with function call
+    - model_class = the machine learning model class, input with function call
+    - training_set = the data training set, input with function call
+    - validation_set = the data validation set, input with function call
+    - test_set = the data test set, input with function call
+
+    - filtered_par = a dictionary of hyperparameter names and values
+    - grid = parameter grid of hyperparameters
+    - model = machine learning model initiated with certain hyperparameters
+    - param = variable going through all values of the grid in a for loop
+    - performance_metrics_list_values = list of all parameter combinations tested
+    - performance_metrics_list_RMSE_validation = list of all RMSE validation values
+    - RMSE_validation = root mean squared error for the validation set
+    - RMSE_validation_0 = comparision value for RMSE_validation
+    - y_hat_validation = model prediction
+
+    - best_hyperparameter_values = the values of hyperparameters that produce best model
+    - best_model = model with the highest RMSE validation value, returned
+    - performance_metrics = results of each test for different combinations of hyperparameters
     '''
 
     RMSE_validation = 0
@@ -47,24 +74,22 @@ def custom_tune_regression_model_hyperparameters(model_class, training_set, vali
     performance_metrics_list_values = []
     performance_metrics_list_RMSE_validation = []
     grid = list(ParameterGrid(hyperparameters))
-    #print(grid)
 
     for param in grid:
         # Process hyperparameters
         filtered_par = {key: value for key, value in param.items() 
                         if key in [parameter.name for parameter in 
                         inspect.signature(model_class).parameters.values()]}
-        #filtered_par = {key: value for key, value in hyperparameters.items() 
-        #                if key in [parameter.name for parameter in 
-        #                inspect.signature(SGDRegressor).parameters.values()]}
+
         # Initiate the model
         model = model_class(**filtered_par) 
-        #print(filtered_par)
 
         # Fit the model
         model.fit(X_train,y_train)
+
         # Make predictions
         y_hat_validation = model.predict(X_validation)
+
         # Evaluate predictions
         RMSE_validation_0 = mean_squared_error(y_validation, 
                                                y_hat_validation, 
@@ -78,45 +103,215 @@ def custom_tune_regression_model_hyperparameters(model_class, training_set, vali
         performance_metrics_list_values.append(param)
         performance_metrics_list_RMSE_validation.append(RMSE_validation_0)
     # end for
+
     performance_metrics = {
         'validation_RMSE': performance_metrics_list_RMSE_validation, 
         'hyperparameter_values': performance_metrics_list_values
     }
 
     return best_model, best_hyperparameter_values, performance_metrics
-    # end custom_tune_regression_model_hyperparameters
+# end custom_tune_regression_model_hyperparameters
 
 
 def tune_regression_model_hyperparameters(model, hyperparameters):
 
     '''
     This function uses SKLearn's GridSearchCV to perform a grid search.
+
+    Variables: 
+    - model = machine learning model to be tested, input with function call
+    - hyperparameters = set of hyperparameters to test, input with function call
+
+    - clf = an object of GridSearchCV initiated with given model and hyperparameters
+
+    - best_estimator = model with the best result in the GridSearchCV testing, returned
+    - best_params = the combination of hyperparameters that produces the best result, returned
+    - best_score = the value of the best result from GridSearchCV, returned
     '''
 
-    clf = GridSearchCV(model, hyperparameters)
+    clf = GridSearchCV(model, hyperparameters)  # , scoring='accuracy'
     clf.fit(X_train, y_train)
     best_estimator = clf.best_estimator_
     best_score = clf.best_score_
     best_params = clf.best_params_
     
-    '''
-    grid = GridSearchCV(model, hyperparameters)
-    # Fit the model for grid search
-    grid.fit(X_train, y_train)
-    # Print best parameter after tunin
-    print(grid.best_params_)
-    grid_predictions = grid.predict(X_test)
-    # Print classification report
-    print(classification_report(y_test, grid_predictions))
-    '''
     return best_estimator, best_score, best_params
-    # end tune_regression_model_hyperparameters
+# end tune_regression_model_hyperparameters
+
+
+def save_model(folder, best_model, best_hyperparameter_values, performance_metrics):
+
+    '''
+    This function writes model, hyperparameters and performance metrics into files. 
+
+    Variables: 
+    - best_hyperparameter_values = best hyperparameter values, input with function call
+    - best_model = best model, input with function call
+    - folder = the path to the folder where files should be written, input with function call
+    - performance_matrics = performance metrics, input with function call
+    '''
+
+    file_name = os.path.join(folder, 'model.joblib')
+    joblib.dump(best_model, file_name)
+    file_name = os.path.join(folder, 'hyperparameters.json')
+    with open(file_name, 'w') as open_file:
+        json.dump(best_hyperparameter_values, open_file)
+    file_name = os.path.join(folder, 'metrics.json')
+    with open(file_name, 'w') as open_file:
+        json.dump(performance_metrics, open_file)
+# end save_model
+
+
+def evaluate_all_models():
+
+    '''
+    This function finds the best set of hyperparameters for Decision Tree Regressor, Random 
+    Forest Regressor, and Gradient Boosting Regressor running them through the function 
+    tune_regression_model_hyperparameters. These hyperparameters are then used to find the 
+    metrics and values of best hyperparameters for each model and save these on the disk. 
+
+    Variables: 
+    - best_estimator = model with the best hyperparameter values
+    - best_params = hyperparameter values that produce the best score
+    - best_score = score acquired with the best hyperparameter values
+    - folder = path to the location where results are saved into various files
+    - hyperparameters = selection of hyperparameter values to be tested and evaluated
+    - model = machine learning model (regressor)
+    '''
+    # Decision Tree Regressor
+    print("Decision Tree Regressor")
+    model = DecisionTreeRegressor()
+    hyperparameters = {
+        "max_depth": [2, 5, 10],
+        "criterion": ["squared_error", "friedman_mse", "poisson"],
+        "min_samples_leaf": [2, 1]
+    }
+    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    print("Best estimator = ", best_estimator)
+    print("Best score = ", best_score)
+    print("Best hyperparameter values = ", best_params)
+
+    folder = os.path.join("models", "regression", "decision_tree")
+    save_model(folder, best_estimator, best_params, best_score)
+
+    # Random Forest Regressor
+    print("Random Forest Regressor")
+    model = RandomForestRegressor()
+    hyperparameters = {
+        "n_estimators": [10, 50, 100, 200],
+        "criterion": ["squared_error", "friedman_mse", "poisson"],
+        "min_samples_leaf": [2, 1]
+    }
+    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    print("Best estimator = ", best_estimator)
+    print("Best score = ", best_score)
+    print("Best hyperparameter values = ", best_params)
+
+    folder = os.path.join("models", "regression", "random_forest")
+    save_model(folder, best_estimator, best_params, best_score)
+
+    # Gradient Boosting Regressor
+    print("Gradient Boosting Regressor")
+    model = GradientBoostingRegressor()
+    hyperparameters = {
+        "n_estimators": [10, 50, 100, 200],
+        "loss": ["squared_error", "absolute_error", "huber"],
+        "min_samples_leaf": [2, 1]
+    }
+    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    print("Best estimator = ", best_estimator)
+    print("Best score = ", best_score)
+    print("Best hyperparameter values = ", best_params)
+
+    folder = os.path.join("models", "regression", "gradient_boosting")
+    save_model(folder, best_estimator, best_params, best_score)
+# end evaluate_all_models
+
+
+def find_best_model():
+
+    '''
+    This function compares the three established 
+
+    Variables: 
+    - best_regressor = list of machine learning models to be compared
+    - chosen_model = position of the best model in the list best_regressor
+    - contents = contents of a file being read
+    - file_name = file to be read with its folder path
+    - i = loop parameter
+    - metrics_value = value of the metrics of the best machine learning model
+    - metrics_value_test = value of the metrics being read from a file
+    - one_of_files = loop parameter
+    - score_file = list of machine learning models with folder paths
+    - score_path = folder path of the best machine learning model
+
+    - hyperparameter_dictionary = hyperparameters of the best model, returned
+    - loaded_model = the best model, returned
+    - metrics_dictionary = metrics of the best model, returned
+    '''
+    best_regressor = []
+    best_regressor.append("decision_tree")
+    best_regressor.append("random_forest")
+    best_regressor.append("gradient_boosting")
+    score_file = []
+    for i in range(len(best_regressor)):
+        score_file.append(os.path.join("models", "regression", best_regressor[i], "metrics.json"))
+    # end for
+    metrics_value = 0.0
+    for one_of_files in range(len(score_file)):
+        with open(score_file[one_of_files], 'r') as contents:
+            metrics_value_test = float(contents.read())
+        # end with
+        if (metrics_value_test > metrics_value):
+            metrics_value = metrics_value_test
+            chosen_model = one_of_files
+        # end if
+    # end for
+    score_path = os.path.join("models", "regression", best_regressor[chosen_model])
+    file_name = os.path.join(score_path, 'model.joblib')
+    loaded_model = joblib.load(file_name)
+    file_name = os.path.join(score_path, 'hyperparameters.json')
+    with open(file_name, 'r') as load_file:
+        hyperparameter_dictionary = json.loads(load_file.read())
+    file_name = os.path.join(score_path, 'metrics.json')
+    with open(file_name, 'r') as load_file:
+        metrics_dictionary = json.loads(load_file.read())
+    return loaded_model, hyperparameter_dictionary, metrics_dictionary
+# end find_best_model
 
 
 
 # ==============================================
 # ===   Main programme   =======================
 # ==============================================
+
+'''
+Go through the steps to produce final results and call functions as needed.
+
+Parameters:
+- best_estimator = model with the best result in the GridSearchCV testing, returned
+- best_hyperparameter_values = the values of hyperparameters that produce best model
+- best_model = model with the highest RMSE validation value, returned
+- best_params = the combination of hyperparameters that produces the best result, returned
+- best_score = the value of the best result from GridSearchCV, returned
+- cv_score = cross validation score
+- df = Pandas dataframe
+- features_labels_tuple = tuple of airbnb data as a Pandas dataframe and column headers as a list
+- hyperparameters = a selection of ranges of hyperparameters for testing and finding the best values
+- model = variable to hold a chosen machine learning model
+- performance_metrics = results of each test for different combinations of hyperparameters
+- score_test = testing set score
+- score_train = training set score
+- sgdr = SGDRegressor object
+- test_set = auxiliary variable to hold X_test
+- training_set = auxiliary variable to hold X_train
+- validation_set = auxiliary variable to hold X_validation
+- X, y, X_train, y_train, X_test, y_test, X_validation, y_validation, y_hat_train, y_hat_test
+   = machine learning division of input data into training, testing and validation sets & predictions
+'''
 
 # Load the input data
 features_labels_tuple = load_airbnb()
@@ -130,9 +325,9 @@ X = scale(X)
 y = scale(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
 X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
-
+''' '''
+# Establish model object and make predictions
 sgdr = SGDRegressor()
-
 sgdr.fit(X_train, y_train)
 y_hat_train = sgdr.predict(X_train)
 y_hat_test = sgdr.predict(X_test)
@@ -160,12 +355,7 @@ print()
 training_set = X_train
 validation_set = X_validation
 test_set = X_test
-'''
-hyperparameters = {
-    "max_samples": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-    "n_estimators": [2, 4, 8, 16, 32, 64, 1024]
-}
-'''
+
 hyperparameters = {
     "alpha": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
     "max_iter": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 
@@ -174,20 +364,11 @@ hyperparameters = {
     "power_t": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 }
 
-# best_model, best_hyperparameter_values, performance_metrics = custom_tune_regression_model_hyperparameters(model_class, training_set, validation_set, test_set, hyperparameters)
-#best_model, best_hyperparameter_values, performance_metrics = custom_tune_regression_model_hyperparameters(SGDRegressor, training_set, validation_set, test_set, hyperparameters)
-
-#print("Best model = ", best_model)
-#print("Best hyperparameter values = ", best_hyperparameter_values)
-#print("Performance metrics = ", performance_metrics)
-
-'''
 best_model, best_hyperparameter_values, performance_metrics = custom_tune_regression_model_hyperparameters(SGDRegressor, training_set, validation_set, test_set, hyperparameters)
 
 print("Best model = ", best_model)
 print("Best hyperparameter values = ", best_hyperparameter_values)
 print("Performance metrics = ", performance_metrics)
-'''
 
 # Feed the model and parameters to a function to perform SK-learn GridSearchCV
 model = SGDRegressor()
@@ -195,3 +376,19 @@ best_estimator, best_score, best_params = tune_regression_model_hyperparameters(
 print("Best estimator: " + str(best_estimator))
 print("Best score: " + str(best_score))
 print("Best parameters: " + str(best_params))
+
+folder = os.path.join("models", "regression", "linear_regression")
+save_model(folder, best_model, best_hyperparameter_values, performance_metrics)
+''' '''
+
+if __name__ == "__main__":
+    # Evaluate a set of alternative models
+    evaluate_all_models()
+
+    # Find the best model from the alternatives
+    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model()
+    print("loaded model = ", loaded_model)
+    print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    print("metrics dictionary = ", metrics_dictionary)
+# end if
+
