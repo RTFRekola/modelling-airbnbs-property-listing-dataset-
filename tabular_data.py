@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Mon 12 Jun 2023 at 18:36 UT
-Last modified on Mon 21 Aug 2023 at 20:44 UT 
+Last modified on Tue 7 Nov 2023 at 19:58 UT
 
 @author: Rami T. F. Rekola 
 
@@ -22,30 +22,21 @@ def clean_tabular_data(df):
 
     '''
     Load a csv file, fix the data, and save the clean data as a new file.
+
+    Variables: 
+    - df = Pandas dataframe with the data, input with function call, return fixed.
     '''
 
     def fix_shifted_rows(df):
 
         '''
-        Move shifted data to correct place
+        Move shifted data to correct place, or, rather, remove the bad row.
+
+        Variables: 
+        - df = Pandas dataframe with the data, input with function call, return fixed
         '''
 
-        ''' The following does not work
-        def shifter(row):
-            return np.hstack((np.delete(np.array(row), [6]), [np.nan]))
-        # end shifter
-
-        df.iloc[19] = df.iloc[19].fillna(1)
-        mask = df['url'] == '46'
-        df.loc[mask, :] = df.loc[mask, :].apply(shifter, axis=1)
-        df = df.drop([19], axis=1)
-        '''
-        ''' The following does not work either
-        mask = df['url'] == '46'
-        df.loc[mask, 6:18] = df.loc[mask, 7:19].shift(periods = -1, axis = 1)
-        '''
-
-        # Just removing row 588 instead, at least for now
+        # Remove the one problematic row.
         df = df.drop(labels=586, axis=0)
         return df
     # end fix_shifted_rows
@@ -55,6 +46,9 @@ def clean_tabular_data(df):
 
         '''
         Remove rows with missing values in ratings columns.
+
+        Variables: 
+        - df = Pandas dataframe with the data, input with function call, return fixed
         '''
 
         df = df.dropna(subset=['Cleanliness_rating'])
@@ -73,20 +67,22 @@ def clean_tabular_data(df):
         Remove rows with empty description. Remove 'About this space' prefixes. 
         Remove empty items and convert carriage returns into single whitespaces.
         Merge list items into the same string. 
+
+        Variables: 
+        - df = Pandas dataframe with the data, input with function call, return fixed
         '''
 
         def make_corrections(description_in):
-            description_mid1 = description_in.replace("'About this space', ", 
+            description_in_progress_11 = description_in.replace("'About this space', ", 
                                                       "")
-            description_mid2 = description_mid1.replace("', '", "")
-            description_mid3 = description_mid2.replace('\\n', ' ')
-            description_mid4 = description_mid3.strip()
-            description_out = (description_mid4.replace("['", "").
+            description_in_progress_2 = description_in_progress_11.replace("', '", "")
+            description_in_progress_3 = description_in_progress_2.replace('\\n', ' ')
+            description_in_progress_4 = description_in_progress_3.strip()
+            description_out = (description_in_progress_4.replace("['", "").
                                replace('["', '').replace('"]', '').
                                replace("']", ""))
             return description_out
         # make_corrections
-
         df = df.dropna(subset=['Description'])
         df['Description'] = df.apply(lambda row: 
                                      make_corrections(row['Description']), 
@@ -99,6 +95,9 @@ def clean_tabular_data(df):
 
         '''
         Replace empty values with a unity in selected columns. 
+
+        Variables: 
+        - df = Pandas dataframe with the data, input with function call, return fixed
         '''
 
         df['guests'] = df['guests'].fillna(1)
@@ -128,6 +127,12 @@ def load_airbnb():
     '''
     Return all numerical values, or features, as a pandas dataframe and their
     headers, or labels, as a list in the tuple format (features, labels)
+
+    Variables: 
+    - df = Pandas dataframe with the data, read in from a file
+    - df_selection = Pandas dataframe with selected columns of the original df
+    - labels_list = list of dataframe column headers
+    - features_labels_tuple = tuple with selected dataframe data and column headers in it, returned
     '''
 
     if __name__ == "__main__":
@@ -144,12 +149,12 @@ def load_airbnb():
     else:
         df = pd.read_csv("../airbnb-local/tabular_data/clean_tabular_data.csv")
 
-        df_selection = df[["guests", "beds", "bathrooms", "Price_Night", 
+        df_selection = df[["Category", "guests", "beds", "bathrooms", "Price_Night", 
                            "Cleanliness_rating", "Accuracy_rating", 
                            "Communication_rating", "Location_rating", 
                            "Check-in_rating", "Value_rating", 
                            "amenities_count", "bedrooms"]]
-        df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '']
+        df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '', '']
 
         # change column type of these columns into numbers
         df[["Price_Night", "guests", "beds", "bathrooms", "Cleanliness_rating", 
@@ -162,7 +167,7 @@ def load_airbnb():
                                "amenities_count", 
                                "bedrooms"]].apply(pd.to_numeric)
 
-        labels_list = ["Price_Night", "guests", "beds", "bathrooms", 
+        labels_list = ["Category", "Price_Night", "guests", "beds", "bathrooms", 
                        "Cleanliness_rating", "Accuracy_rating", 
                        "Communication_rating", "Location_rating", 
                        "Check-in_rating", "Value_rating", 

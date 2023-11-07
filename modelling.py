@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Thu 26 Oct 2023 at 14:15 UT 
+Last modified on Tue 7 Nov 2023 at 20:01 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -20,9 +20,9 @@ import inspect
 from inspect import signature
 
 #import sklearn
-from sklearn import datasets, model_selection
+from sklearn import datasets, model_selection, preprocessing, utils
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
-from sklearn.linear_model import SGDRegressor
+from sklearn.linear_model import SGDRegressor, LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import cross_val_score
@@ -162,6 +162,47 @@ def save_model(folder, best_model, best_hyperparameter_values, performance_metri
 # end save_model
 
 
+def evaluate_sgdregressor():
+
+    '''
+    This function evaluates how good the SGDRegressor model is with the Airbnb data.
+
+    Variables: 
+    - cv_score = cross validation score
+    - score_test = testing set score
+    - score_train = training set score
+    - sgdr = SGDRegressor object
+    - X, y, X_train, y_train, X_test, y_test, y_hat_train, y_hat_test
+        = machine learning division of input data into training and testing sets & predictions
+    '''
+
+    # Establish model object and make predictions
+    sgdr = SGDRegressor()
+    sgdr.fit(X_train, y_train)
+    y_hat_train = sgdr.predict(X_train)
+    y_hat_test = sgdr.predict(X_test)
+
+    # Compute the key measures of performance for the regression model
+    cv_score = cross_val_score(sgdr, X, y, cv = 10)
+    print("CV mean score: ", cv_score.mean())
+    print()
+
+    print("MSE (train):", mean_squared_error(y_train, y_hat_train))
+    print("MSE (test):", mean_squared_error(y_test, y_hat_test))
+    print()
+
+    print("RMSE (train):", mean_squared_error(y_train, y_hat_train, squared=False))
+    print("RMSE (test):", mean_squared_error(y_test, y_hat_test, squared=False))
+    print()
+
+    score_train = sgdr.score(X_train, y_train)
+    print("R-squared (train):", score_train)
+    score_test = sgdr.score(X_test, y_test)
+    print("R-squared (test):", score_test)
+    print()
+# end evaluate_sgdregressor
+
+
 def evaluate_all_models():
 
     '''
@@ -231,6 +272,59 @@ def evaluate_all_models():
 # end evaluate_all_models
 
 
+def find_best_sgdregressor():
+
+    '''
+    This function feeds a grid of hyperparameters to regression model tuning function and finds 
+    the best set of hyperparameters, i.e. the ones that result in the best score for the model. 
+
+    Variables: 
+    - best_estimator = model with the best result in the GridSearchCV testing, returned
+    - best_hyperparameter_values = the values of hyperparameters that produce best model
+    - best_model = model with the highest RMSE validation value, returned
+    - best_params = the combination of hyperparameters that produces the best result, returned
+    - best_score = the value of the best result from GridSearchCV, returned
+    - features_labels_tuple = tuple of airbnb data as a Pandas dataframe and column headers as a list
+    - hyperparameters = a selection of ranges of hyperparameters for testing & finding the best values
+    - model = variable to hold a chosen machine learning model
+    - performance_metrics = results of each test for different combinations of hyperparameters
+    - test_set = auxiliary variable to hold X_test
+    - training_set = auxiliary variable to hold X_train
+    - validation_set = auxiliary variable to hold X_validation
+    '''
+
+    # Feed the model class and parameters to a function for finding the best model
+    training_set = X_train
+    validation_set = X_validation
+    test_set = X_test
+
+    hyperparameters = {
+        "alpha": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
+        "max_iter": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 
+        "learning_rate": ['constant'],  # constant for eta0; invscaling for power_t
+        "eta0": [0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1],
+        "power_t": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    }
+
+    best_model, best_hyperparameter_values, performance_metrics = custom_tune_regression_model_hyperparameters(SGDRegressor, training_set, validation_set, test_set, hyperparameters)
+
+    print("Best model = ", best_model)
+    print("Best hyperparameter values = ", best_hyperparameter_values)
+    print("Performance metrics = ", performance_metrics)
+
+    # Feed the model and parameters to a function to perform SK-learn GridSearchCV
+    model = SGDRegressor()
+    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model,
+                                                                                    hyperparameters)
+    print("Best estimator: " + str(best_estimator))
+    print("Best score: " + str(best_score))
+    print("Best parameters: " + str(best_params))
+
+    folder = os.path.join("models", "regression", "linear_regression")
+    save_model(folder, best_model, best_hyperparameter_values, performance_metrics)
+# end find_best_sgdregressor
+
+
 def find_best_model():
 
     '''
@@ -292,103 +386,50 @@ def find_best_model():
 Go through the steps to produce final results and call functions as needed.
 
 Parameters:
-- best_estimator = model with the best result in the GridSearchCV testing, returned
-- best_hyperparameter_values = the values of hyperparameters that produce best model
-- best_model = model with the highest RMSE validation value, returned
-- best_params = the combination of hyperparameters that produces the best result, returned
-- best_score = the value of the best result from GridSearchCV, returned
-- cv_score = cross validation score
 - df = Pandas dataframe
-- features_labels_tuple = tuple of airbnb data as a Pandas dataframe and column headers as a list
-- hyperparameters = a selection of ranges of hyperparameters for testing and finding the best values
-- model = variable to hold a chosen machine learning model
-- performance_metrics = results of each test for different combinations of hyperparameters
-- score_test = testing set score
-- score_train = training set score
-- sgdr = SGDRegressor object
-- test_set = auxiliary variable to hold X_test
-- training_set = auxiliary variable to hold X_train
-- validation_set = auxiliary variable to hold X_validation
-- X, y, X_train, y_train, X_test, y_test, X_validation, y_validation, y_hat_train, y_hat_test
-   = machine learning division of input data into training, testing and validation sets & predictions
+- X, y, X_train, y_train, X_test, y_test, X_validation, y_validation
+   = machine learning division of input data into training, testing and validation sets
 '''
 
 # Load the input data
 features_labels_tuple = load_airbnb()
 
-# Using sklearn to train a linear regression model to predict 
-# the "Price_Night feature from the tabular data
-df = features_labels_tuple[0]
+# Using sklearn to train a linear regression model to predict first 
+# the "Price_Night" and then the "Category" feature from the tabular data.
+df_in = features_labels_tuple[0]
+df = df_in.replace(['Treehouses', 'Category', 'Chalets', 'Amazing pools', 'Offbeat', 'Beachfront'],
+                   [1, 1, 2, 3, 4, 5])
+
 X = df.iloc[:, 1:]
-y = df.iloc[:, 0]
+y_in = df.iloc[:, 0]
+# Convert y values to categorical values
+lab = preprocessing.LabelEncoder()
+y = lab.fit_transform(y_in)
+print(y)
 X = scale(X)
 y = scale(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
 X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
-''' '''
-# Establish model object and make predictions
-sgdr = SGDRegressor()
-sgdr.fit(X_train, y_train)
-y_hat_train = sgdr.predict(X_train)
-y_hat_test = sgdr.predict(X_test)
-
-# Compute the key measures of performance for the regression model
-cv_score = cross_val_score(sgdr, X, y, cv = 10)
-print("CV mean score: ", cv_score.mean())
-print()
-
-print("MSE (train):", mean_squared_error(y_train, y_hat_train))
-print("MSE (test):", mean_squared_error(y_test, y_hat_test))
-print()
-
-print("RMSE (train):", mean_squared_error(y_train, y_hat_train, squared=False))
-print("RMSE (test):", mean_squared_error(y_test, y_hat_test, squared=False))
-print()
-
-score_train = sgdr.score(X_train, y_train)
-print("R-squared (train):", score_train)
-score_test = sgdr.score(X_test, y_test)
-print("R-squared (test):", score_test)
-print()
-
-# Feed the model class and parameters to a function for finding the best model
-training_set = X_train
-validation_set = X_validation
-test_set = X_test
-
-hyperparameters = {
-    "alpha": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
-    "max_iter": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 
-    "learning_rate": ['constant'],  # constant for eta0; invscaling for power_t
-    "eta0": [0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1],
-    "power_t": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-}
-
-best_model, best_hyperparameter_values, performance_metrics = custom_tune_regression_model_hyperparameters(SGDRegressor, training_set, validation_set, test_set, hyperparameters)
-
-print("Best model = ", best_model)
-print("Best hyperparameter values = ", best_hyperparameter_values)
-print("Performance metrics = ", performance_metrics)
-
-# Feed the model and parameters to a function to perform SK-learn GridSearchCV
-model = SGDRegressor()
-best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, hyperparameters)
-print("Best estimator: " + str(best_estimator))
-print("Best score: " + str(best_score))
-print("Best parameters: " + str(best_params))
-
-folder = os.path.join("models", "regression", "linear_regression")
-save_model(folder, best_model, best_hyperparameter_values, performance_metrics)
-''' '''
 
 if __name__ == "__main__":
+    # Evaluate SGDregressor model
+    #evaluate_sgdregressor()
+    #find_best_sgdregressor()
+
     # Evaluate a set of alternative models
-    evaluate_all_models()
+    #evaluate_all_models()
 
     # Find the best model from the alternatives
-    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model()
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
-# end if
+    #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model()
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
 
+    # Train logistic regression to predict the category from the tabular data
+    model = LogisticRegression()
+    model.fit(X_train, y_train)
+    y_hat_train = model.predict(X_train)
+    y_hat_test = model.predict(X_test)
+    print(y_hat_train)
+    print(y_hat_test)
+# end if
