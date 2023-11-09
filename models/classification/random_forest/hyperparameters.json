@@ -1,0 +1,1 @@
+{"criterion": "log_loss", "min_samples_leaf": 2, "n_estimators": 100}

@@ -57,3 +57,7 @@ Extracted all numerical values (columns with numbers) into a Pandas DataFrame wi
 Build a system to train and evaluate machine learning models. 
 
 Read the numerical values data in as the data for machine learning models. Used four different sklearn regression models to analyse the Airbnb data with: SGDRegressor, DecisionTreeRegressor, RandomForestRegressor, and GradientBoostingRegressor. Analysed the quality of SGDRegressor with RMSE and R-squared methods, and a specific function that manually performs a grid search over a range of hyperparameter values in order to find the ones that provide highest performance metrics value. Furthermore, analysed each of the models with the sklearn built-in GridSearchCV. 
+
+### Classification Model Creation
+
+Imported Airbnb data with column "Category" as the label. Trained sklearn LogisticRegressor to predict the category from the data. Calculated the F1 score, precision score, recall score and accuracy score for both the training and test set. Performed grid search over a range of hyperparameters to find the best combination, with output consisting of the best model, the best hyperparameter values and the validation accuracy. Expanded the same to three more classifiers: DecisionTreeClassifier, RandomForestClassifier, and GradientBoostingClassifier. Implemented search for the best overall classification model. 

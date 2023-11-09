@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Tue 7 Nov 2023 at 20:01 UT 
+Last modified on Thu 9 Nov 2023 at 19:36 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -21,10 +21,11 @@ from inspect import signature
 
 #import sklearn
 from sklearn import datasets, model_selection, preprocessing, utils
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import SGDRegressor, LogisticRegression
-from sklearn.metrics import classification_report
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import f1_score, mean_squared_error, precision_score, recall_score
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import ParameterGrid
@@ -32,7 +33,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import StandardScaler
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from tabular_data import load_airbnb
 
 
@@ -129,13 +130,14 @@ def tune_regression_model_hyperparameters(model, hyperparameters):
     - best_score = the value of the best result from GridSearchCV, returned
     '''
 
-    clf = GridSearchCV(model, hyperparameters)  # , scoring='accuracy'
+    clf = GridSearchCV(model, hyperparameters) #, scoring='accuracy')
     clf.fit(X_train, y_train)
     best_estimator = clf.best_estimator_
     best_score = clf.best_score_
     best_params = clf.best_params_
+    metrics_dict = {"validation_score": best_score}
     
-    return best_estimator, best_score, best_params
+    return best_estimator, best_params, metrics_dict
 # end tune_regression_model_hyperparameters
 
 
@@ -203,15 +205,20 @@ def evaluate_sgdregressor():
 # end evaluate_sgdregressor
 
 
-def evaluate_all_models():
+def evaluate_all_models(task_folder):
 
     '''
-    This function finds the best set of hyperparameters for Decision Tree Regressor, Random 
-    Forest Regressor, and Gradient Boosting Regressor running them through the function 
-    tune_regression_model_hyperparameters. These hyperparameters are then used to find the 
+    This function finds the best set of hyperparameters for a series of regression models (Decision 
+    Tree Regressor, Random Forest Regressor, and Gradient Boosting Regressor) or classification 
+    models (Decision Tree Classifier, Random Forest Classifier, and Gradient Boosting Classifier) 
+    running them through either the function tune_regression_model_hyperparameters or 
+    tune_classification_model_hyperparameters. These hyperparameters are then used to find the 
     metrics and values of best hyperparameters for each model and save these on the disk. 
 
     Variables: 
+    - task_folder = indicator of whether regression or classification models are being evaluated; 
+       also setting the folder into which their results are written, input with function call
+
     - best_estimator = model with the best hyperparameter values
     - best_params = hyperparameter values that produce the best score
     - best_score = score acquired with the best hyperparameter values
@@ -219,55 +226,95 @@ def evaluate_all_models():
     - hyperparameters = selection of hyperparameter values to be tested and evaluated
     - model = machine learning model (regressor)
     '''
-    # Decision Tree Regressor
-    print("Decision Tree Regressor")
-    model = DecisionTreeRegressor()
-    hyperparameters = {
-        "max_depth": [2, 5, 10],
-        "criterion": ["squared_error", "friedman_mse", "poisson"],
-        "min_samples_leaf": [2, 1]
-    }
-    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, 
-                                                                                    hyperparameters)
-    print("Best estimator = ", best_estimator)
-    print("Best score = ", best_score)
-    print("Best hyperparameter values = ", best_params)
 
-    folder = os.path.join("models", "regression", "decision_tree")
+    if (task_folder == "regression"):
+        # Decision Tree Regressor
+        print("Decision Tree Regressor")
+        model = DecisionTreeRegressor()
+        hyperparameters = {
+            "max_depth": [2, 5, 10],
+            "criterion": ["squared_error", "friedman_mse", "poisson"],
+            "min_samples_leaf": [2, 1]
+        }
+        best_estimator, best_params, best_score = tune_regression_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    elif (task_folder == "classification"):
+        # Decision Tree Classifier
+        print("Decision Tree Classifier")
+        model = DecisionTreeClassifier()
+        hyperparameters = {
+            "max_depth": [2, 5, 10],
+            "criterion": ["gini", "entropy", "log_loss"],
+            "min_samples_leaf": [2, 1]
+        }
+        best_estimator, best_params, best_score = tune_classification_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    # end if
+    print("Best estimator = ", best_estimator)
+    print("Best hyperparameter values = ", best_params)
+    print("Best score = ", best_score)
+
+    folder = os.path.join("models", task_folder, "decision_tree")
     save_model(folder, best_estimator, best_params, best_score)
 
-    # Random Forest Regressor
-    print("Random Forest Regressor")
-    model = RandomForestRegressor()
-    hyperparameters = {
-        "n_estimators": [10, 50, 100, 200],
-        "criterion": ["squared_error", "friedman_mse", "poisson"],
-        "min_samples_leaf": [2, 1]
-    }
-    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, 
+    if  (task_folder == "regression"):
+        # Random Forest Regressor
+        print("Random Forest Regressor")
+        model = RandomForestRegressor()
+        hyperparameters = {
+            "n_estimators": [10, 50, 100, 200],
+            "criterion": ["squared_error", "friedman_mse", "poisson"],
+            "min_samples_leaf": [2, 1]
+        }
+        best_estimator, best_params, best_score = tune_regression_model_hyperparameters(model, 
                                                                                     hyperparameters)
+    elif (task_folder == "classification"):
+        # Random Forest Classifier
+        print("Random Forest Classifier")
+        model = RandomForestClassifier()
+        hyperparameters = {
+            "n_estimators": [10, 50, 100, 200],
+            "criterion": ["gini", "entropy", "log_loss"],
+            "min_samples_leaf": [2, 1]
+        }
+        best_estimator, best_params, best_score = tune_classification_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    # end if
     print("Best estimator = ", best_estimator)
     print("Best score = ", best_score)
     print("Best hyperparameter values = ", best_params)
 
-    folder = os.path.join("models", "regression", "random_forest")
+    folder = os.path.join("models", task_folder, "random_forest")
     save_model(folder, best_estimator, best_params, best_score)
 
-    # Gradient Boosting Regressor
-    print("Gradient Boosting Regressor")
-    model = GradientBoostingRegressor()
-    hyperparameters = {
-        "n_estimators": [10, 50, 100, 200],
-        "loss": ["squared_error", "absolute_error", "huber"],
-        "min_samples_leaf": [2, 1]
-    }
-    best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, 
+    if (task_folder == "regression"):
+        # Gradient Boosting Regressor
+        print("Gradient Boosting Regressor")
+        model = GradientBoostingRegressor()
+        hyperparameters = {
+            "n_estimators": [10, 50, 100, 200],
+            "loss": ["squared_error", "absolute_error", "huber"],
+            "min_samples_leaf": [2, 1]
+        }
+        best_estimator, best_params, best_score = tune_regression_model_hyperparameters(model, 
                                                                                     hyperparameters)
+    elif (task_folder == "classification"):
+        # Gradient Boosting Classifier
+        print("Gradient Boosting Classifier")
+        model = GradientBoostingClassifier()
+        hyperparameters = {
+            "n_estimators": [10, 50, 100, 200],
+            "criterion": ["friedman_mse", "squared_error"],
+            "min_samples_leaf": [2, 1]
+        }
+        best_estimator, best_params, best_score = tune_classification_model_hyperparameters(model, 
+                                                                                    hyperparameters)
+    # end if
     print("Best estimator = ", best_estimator)
     print("Best score = ", best_score)
     print("Best hyperparameter values = ", best_params)
 
-    folder = os.path.join("models", "regression", "gradient_boosting")
+    folder = os.path.join("models", task_folder, "gradient_boosting")
     save_model(folder, best_estimator, best_params, best_score)
 # end evaluate_all_models
 
@@ -279,11 +326,7 @@ def find_best_sgdregressor():
     the best set of hyperparameters, i.e. the ones that result in the best score for the model. 
 
     Variables: 
-    - best_estimator = model with the best result in the GridSearchCV testing, returned
     - best_hyperparameter_values = the values of hyperparameters that produce best model
-    - best_model = model with the highest RMSE validation value, returned
-    - best_params = the combination of hyperparameters that produces the best result, returned
-    - best_score = the value of the best result from GridSearchCV, returned
     - features_labels_tuple = tuple of airbnb data as a Pandas dataframe and column headers as a list
     - hyperparameters = a selection of ranges of hyperparameters for testing & finding the best values
     - model = variable to hold a chosen machine learning model
@@ -291,6 +334,10 @@ def find_best_sgdregressor():
     - test_set = auxiliary variable to hold X_test
     - training_set = auxiliary variable to hold X_train
     - validation_set = auxiliary variable to hold X_validation
+
+    - best_estimator = model with the best result in the GridSearchCV testing, returned
+    - best_params = the combination of hyperparameters that produces the best result, returned
+    - best_score = the value of the best result from GridSearchCV, returned
     '''
 
     # Feed the model class and parameters to a function for finding the best model
@@ -321,23 +368,27 @@ def find_best_sgdregressor():
     print("Best parameters: " + str(best_params))
 
     folder = os.path.join("models", "regression", "linear_regression")
-    save_model(folder, best_model, best_hyperparameter_values, performance_metrics)
+    save_model(folder, best_estimator, best_hyperparameter_values, performance_metrics)
 # end find_best_sgdregressor
 
 
-def find_best_model():
+def find_best_model(task_folder):
 
     '''
-    This function compares the three established 
+    This function compares the machine learning models that have been processed by functions 
+    tune_regression_model_hyperparameters and tune_classification_model_hyperparameters. 
 
     Variables: 
-    - best_regressor = list of machine learning models to be compared
-    - chosen_model = position of the best model in the list best_regressor
+    - task_folder = indicator of whether regression or classification models are being evaluated; 
+       also setting the folder into which their results are written, input with function call
+
+    - chosen_model = position of the best model in the list "model_to_compare"
     - contents = contents of a file being read
     - file_name = file to be read with its folder path
     - i = loop parameter
     - metrics_value = value of the metrics of the best machine learning model
     - metrics_value_test = value of the metrics being read from a file
+    - model_to_compare = list of machine learning models to be compared
     - one_of_files = loop parameter
     - score_file = list of machine learning models with folder paths
     - score_path = folder path of the best machine learning model
@@ -346,25 +397,28 @@ def find_best_model():
     - loaded_model = the best model, returned
     - metrics_dictionary = metrics of the best model, returned
     '''
-    best_regressor = []
-    best_regressor.append("decision_tree")
-    best_regressor.append("random_forest")
-    best_regressor.append("gradient_boosting")
+
+    model_to_compare = []
+    model_to_compare.append("decision_tree")
+    model_to_compare.append("random_forest")
+    model_to_compare.append("gradient_boosting")
     score_file = []
-    for i in range(len(best_regressor)):
-        score_file.append(os.path.join("models", "regression", best_regressor[i], "metrics.json"))
+    for i in range(len(model_to_compare)):
+        score_file.append(os.path.join("models", task_folder, model_to_compare[i], "metrics.json"))
     # end for
     metrics_value = 0.0
     for one_of_files in range(len(score_file)):
         with open(score_file[one_of_files], 'r') as contents:
-            metrics_value_test = float(contents.read())
+#            file_contents = json.loads(contents.read())
+#            metrics_value_test = float(file_contents.get('validation_accuracy'))
+            metrics_value_test = float(json.loads(contents.read()).get('validation_accuracy'))
         # end with
         if (metrics_value_test > metrics_value):
             metrics_value = metrics_value_test
             chosen_model = one_of_files
         # end if
     # end for
-    score_path = os.path.join("models", "regression", best_regressor[chosen_model])
+    score_path = os.path.join("models", task_folder, model_to_compare[chosen_model])
     file_name = os.path.join(score_path, 'model.joblib')
     loaded_model = joblib.load(file_name)
     file_name = os.path.join(score_path, 'hyperparameters.json')
@@ -375,6 +429,81 @@ def find_best_model():
         metrics_dictionary = json.loads(load_file.read())
     return loaded_model, hyperparameter_dictionary, metrics_dictionary
 # end find_best_model
+
+
+def train_and_evaluate_logistic_regression():
+
+    '''
+    This function trains the logistic regression model to predict the "Category" column 
+    from the tabular data. Then it calculates various performance values for the training 
+    and test sets. 
+
+    Variables: 
+    - model = initiated logistic regression 
+    - y_hat_train, y_hat_test = machine learning predictions
+    '''
+
+    # Train logistic regression to predict the category from the tabular data
+    model = LogisticRegression()
+    model.fit(X_train, y_train)
+    y_hat_train = model.predict(X_train)
+    y_hat_test = model.predict(X_test)
+
+    # Compute the F1 score, precision score, recall score and accuracy score
+    print("F1 score for train set:  ", f1_score(y_train, y_hat_train, average="macro"))
+    print("F1 score for test set:   ", f1_score(y_test, y_hat_test, average="macro"))
+    print("Precision for train set: ", precision_score(y_train, y_hat_train, average="macro"))
+    print("Precision for test set:  ", precision_score(y_test, y_hat_test, average="macro"))
+    print("Recall for train set:    ", recall_score(y_train, y_hat_train, average="macro"))
+    print("Recall for test set:     ", recall_score(y_test, y_hat_test, average="macro"))
+    print("Accuracy for train set:  ", accuracy_score(y_train, y_hat_train))
+    print("Accuracy for test set:   ", accuracy_score(y_test, y_hat_test))
+
+    # Tune hyperparameters
+    hyperparameters = {
+        "solver": ["newton-cg", "newton-cholesky", "sag", "saga"],
+        "max_iter": [10, 50, 100, 200],
+        "C": [0.5, 1, 2]
+    }
+    best_model, best_params, metrics_dict = tune_classification_model_hyperparameters(model,
+                                                                                      hyperparameters)
+    
+    print("Best model = ", best_model)
+    print("Best hyperparameter values = ", best_params)
+    print("Accuracy = ", metrics_dict)
+# end train_and_evaluate_logistic_regression
+
+
+def tune_classification_model_hyperparameters(model, hyperparameters):
+
+    '''
+    This function uses SKLearn's GridSearchCV to perform a grid search to find the best set of
+    hyperparameters. Then it saves the performance values into files. 
+
+    Variables: 
+    - model = machine learning model to be tested, input with function call
+    - hyperparameters = set of hyperparameters to test, input with function call
+
+    - clf = an object of GridSearchCV initiated with given model and hyperparameters
+
+    - best_model = model with the best result in the GridSearchCV testing, returned
+    - best_params = the combination of hyperparameters that produces the best result, returned
+    - metrics_dict = the accuracy of the best result from GridSearchCV, returned
+    '''
+
+    # Grid search for the best model
+    clf = GridSearchCV(model, hyperparameters, scoring='accuracy')
+    clf.fit(X_train, y_train)
+    best_model = clf.best_estimator_
+    best_params = clf.best_params_
+    metrics_dict = {"validation_accuracy": clf.best_score_}
+
+    # Save the model performance values
+    folder = os.path.join("models", "classification", "logistic_regression")
+    save_model(folder, best_model, best_params, metrics_dict)
+
+    return best_model, best_params, metrics_dict
+# end tune_classification_model_hyperparameters
 
 
 
@@ -401,35 +530,37 @@ df = df_in.replace(['Treehouses', 'Category', 'Chalets', 'Amazing pools', 'Offbe
                    [1, 1, 2, 3, 4, 5])
 
 X = df.iloc[:, 1:]
-y_in = df.iloc[:, 0]
-# Convert y values to categorical values
-lab = preprocessing.LabelEncoder()
-y = lab.fit_transform(y_in)
+y = df.iloc[:, 0]
 print(y)
 X = scale(X)
-y = scale(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
 X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
 
 if __name__ == "__main__":
     # Evaluate SGDregressor model
-    #evaluate_sgdregressor()
-    #find_best_sgdregressor()
+    evaluate_sgdregressor()
+    find_best_sgdregressor()
 
-    # Evaluate a set of alternative models
-    #evaluate_all_models()
+    # Evaluate a set of alternative regression models
+    evaluate_all_models("regression")
 
-    # Find the best model from the alternatives
-    #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model()
-    #print("loaded model = ", loaded_model)
-    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    #print("metrics dictionary = ", metrics_dictionary)
+    # Find the best regression model from those processed earlier
+    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
+    print("loaded model = ", loaded_model)
+    print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    print("metrics dictionary = ", metrics_dictionary)
 
-    # Train logistic regression to predict the category from the tabular data
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
-    y_hat_train = model.predict(X_train)
-    y_hat_test = model.predict(X_test)
-    print(y_hat_train)
-    print(y_hat_test)
+    # Train and evaluate logistic regression
+    train_and_evaluate_logistic_regression()
+
+    # Evaluate a set of alternative classification models
+    evaluate_all_models("classification")
+
+    # Find the best classification model from those processed earlier
+    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
+    print("loaded model = ", loaded_model)
+    print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    print("metrics dictionary = ", metrics_dictionary)
+
 # end if
+
