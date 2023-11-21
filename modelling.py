@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Thu 9 Nov 2023 at 19:36 UT 
+Last modified on Tue 21 Nov 2023 at 11:55 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -15,6 +15,10 @@ import json
 import numpy as np
 import os
 import pandas as pd
+import torch
+import typing
+
+from io import StringIO
 
 import inspect
 from inspect import signature
@@ -34,6 +38,11 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
+import torch
+import torch.nn.functional as f
+from torch.utils.data import DataLoader, Dataset
+
 from tabular_data import load_airbnb
 
 
@@ -409,8 +418,6 @@ def find_best_model(task_folder):
     metrics_value = 0.0
     for one_of_files in range(len(score_file)):
         with open(score_file[one_of_files], 'r') as contents:
-#            file_contents = json.loads(contents.read())
-#            metrics_value_test = float(file_contents.get('validation_accuracy'))
             metrics_value_test = float(json.loads(contents.read()).get('validation_accuracy'))
         # end with
         if (metrics_value_test > metrics_value):
@@ -515,7 +522,16 @@ def tune_classification_model_hyperparameters(model, hyperparameters):
 Go through the steps to produce final results and call functions as needed.
 
 Parameters:
-- df = Pandas dataframe
+- dataset = neural network dataset
+- df_in = Pandas dataframe with Airbnb data in it
+- df = Pandas dataframe, where "Category" values have been converted into numerical values
+- model = chosen model for neural network
+- test_loader = dataloader for the test set
+- test_set = test set for neural network
+- train_len = desired fraction of the length of dataset for training set divisions
+- train_loader = dataloader for the training set
+- train_set = training set for neural network
+- validation_set = validation set for the neural network
 - X, y, X_train, y_train, X_test, y_test, X_validation, y_validation
    = machine learning division of input data into training, testing and validation sets
 '''
@@ -533,34 +549,139 @@ X = df.iloc[:, 1:]
 y = df.iloc[:, 0]
 print(y)
 X = scale(X)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
-X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
+# Pre Milestone 6, Task 1
+#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+#X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
+# Post Milestone 6, Task 1
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.25)
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # Evaluate SGDregressor model
-    evaluate_sgdregressor()
-    find_best_sgdregressor()
+    #evaluate_sgdregressor()
+    #find_best_sgdregressor()
 
     # Evaluate a set of alternative regression models
-    evaluate_all_models("regression")
+    #evaluate_all_models("regression")
 
     # Find the best regression model from those processed earlier
-    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
+    #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
 
     # Train and evaluate logistic regression
-    train_and_evaluate_logistic_regression()
+    #train_and_evaluate_logistic_regression()
 
     # Evaluate a set of alternative classification models
-    evaluate_all_models("classification")
+    #evaluate_all_models("classification")
 
     # Find the best classification model from those processed earlier
-    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
+     #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
 
 # end if
 
+class AirbnbNightlyPriceRegressionDataset(Dataset):
+
+    '''
+    This class takes the Airbnb data and returns numerical Airbnb features and price per night labels. 
+
+    Variables: 
+    example = Airbnb data on the row "index"
+    self.features = the numerical Airbnb features of the house
+    self.label = the price per night of the house
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.data = features_labels_tuple[0]
+
+    def __getitem__(self, index):
+        example = self.data.iloc[index]
+        self.features = example[1:]
+        self.label = example[0]
+        return (torch.tensor(self.features), self.label)
+
+    def __len__(self):
+        return len(self.data)
+# end AirbnbNightlyPriceRegressionDataset
+
+class LinearRegression(torch.nn.Module):
+
+    '''
+    This class takes the numerical Airbnb features and returns a Linear Regression model on these 
+    features.
+
+    Variables: 
+    self.linear_layer = the Torch Linear Regression model (for the exact number of features we have)
+    '''
+
+    def __init__(self):
+        super().__init__()
+        # Initialise parameters.
+        self.linear_layer = torch.nn.Linear(11, 1)
+        pass
+
+    def __call__(self, features):
+        # Use the layers of transformation to proceess the features.
+        return self.linear_layer(features)
+# end LinearRegression
+
+def train(model, loader, epochs=10):
+
+    '''
+    This function does training on the neural network model. 
+
+    Variables: 
+    - epochs = the number of epochs to be processed, input with function call
+    - model = the instantiated neural network model to be used, input with function call
+    - loader = the dataloader, input with function call
+
+    - batch = loop parameter
+    - epoch = loop parameter
+    - features = numerical Airbnb features
+    - labels = price per night
+    - prediction = the neural network output
+    '''
+
+    for epoch in range(epochs):
+        for batch in loader:
+            features, labels = batch
+            prediction = model(features)
+            #loss = f.mse_loss(prediction, labels)
+            #loss.backward()
+            # Optimisation step
+            break
+        # end for
+    # end for
+# end train
+
+dataset = AirbnbNightlyPriceRegressionDataset()
+
+train_len = int(len(dataset)*0.8)      
+train_set, test_set = torch.utils.data.random_split(dataset, [train_len, len(dataset)-train_len])
+
+#dataloader = DataLoader(dataset, shuffle=True) #, batch_size=64)
+train_loader = DataLoader(train_set, shuffle=True, batch_size=4)
+test_loader = DataLoader(test_set, shuffle=True, batch_size=4)
+
+#for (X, y) in dataloader:
+#    print(X, y)
+#    print(X.shape, y.shape)
+
+train_len = int(len(train_set)*0.75)      
+train_set, validation_set = torch.utils.data.random_split(train_set, [train_len, 
+                                                                      len(train_set)-train_len])
+example = next(iter(train_loader))
+features, labels = example
+print(features)
+print(labels)
+
+model = LinearRegression()
+#print(model(features))
+
+epochs = 10
+train(model, train_loader, epochs)
