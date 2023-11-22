@@ -15,7 +15,6 @@ import json
 import numpy as np
 import os
 import pandas as pd
-import torch
 import typing
 
 from io import StringIO
@@ -38,10 +37,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-
-import torch
-import torch.nn.functional as f
-from torch.utils.data import DataLoader, Dataset
 
 from tabular_data import load_airbnb
 
@@ -549,139 +544,33 @@ X = df.iloc[:, 1:]
 y = df.iloc[:, 0]
 print(y)
 X = scale(X)
-# Pre Milestone 6, Task 1
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
-#X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
-# Post Milestone 6, Task 1
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.25)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
     # Evaluate SGDregressor model
-    #evaluate_sgdregressor()
-    #find_best_sgdregressor()
+    evaluate_sgdregressor()
+    find_best_sgdregressor()
 
     # Evaluate a set of alternative regression models
-    #evaluate_all_models("regression")
+    evaluate_all_models("regression")
 
     # Find the best regression model from those processed earlier
-    #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
-    #print("loaded model = ", loaded_model)
-    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    #print("metrics dictionary = ", metrics_dictionary)
+    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
+    print("loaded model = ", loaded_model)
+    print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    print("metrics dictionary = ", metrics_dictionary)
 
     # Train and evaluate logistic regression
-    #train_and_evaluate_logistic_regression()
+    train_and_evaluate_logistic_regression()
 
     # Evaluate a set of alternative classification models
-    #evaluate_all_models("classification")
+    evaluate_all_models("classification")
 
     # Find the best classification model from those processed earlier
-     #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
-    #print("loaded model = ", loaded_model)
-    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    #print("metrics dictionary = ", metrics_dictionary)
+    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
+    print("loaded model = ", loaded_model)
+    print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    print("metrics dictionary = ", metrics_dictionary)
 
 # end if
-
-class AirbnbNightlyPriceRegressionDataset(Dataset):
-
-    '''
-    This class takes the Airbnb data and returns numerical Airbnb features and price per night labels. 
-
-    Variables: 
-    example = Airbnb data on the row "index"
-    self.features = the numerical Airbnb features of the house
-    self.label = the price per night of the house
-    '''
-
-    def __init__(self):
-        super().__init__()
-        self.data = features_labels_tuple[0]
-
-    def __getitem__(self, index):
-        example = self.data.iloc[index]
-        self.features = example[1:]
-        self.label = example[0]
-        return (torch.tensor(self.features), self.label)
-
-    def __len__(self):
-        return len(self.data)
-# end AirbnbNightlyPriceRegressionDataset
-
-class LinearRegression(torch.nn.Module):
-
-    '''
-    This class takes the numerical Airbnb features and returns a Linear Regression model on these 
-    features.
-
-    Variables: 
-    self.linear_layer = the Torch Linear Regression model (for the exact number of features we have)
-    '''
-
-    def __init__(self):
-        super().__init__()
-        # Initialise parameters.
-        self.linear_layer = torch.nn.Linear(11, 1)
-        pass
-
-    def __call__(self, features):
-        # Use the layers of transformation to proceess the features.
-        return self.linear_layer(features)
-# end LinearRegression
-
-def train(model, loader, epochs=10):
-
-    '''
-    This function does training on the neural network model. 
-
-    Variables: 
-    - epochs = the number of epochs to be processed, input with function call
-    - model = the instantiated neural network model to be used, input with function call
-    - loader = the dataloader, input with function call
-
-    - batch = loop parameter
-    - epoch = loop parameter
-    - features = numerical Airbnb features
-    - labels = price per night
-    - prediction = the neural network output
-    '''
-
-    for epoch in range(epochs):
-        for batch in loader:
-            features, labels = batch
-            prediction = model(features)
-            #loss = f.mse_loss(prediction, labels)
-            #loss.backward()
-            # Optimisation step
-            break
-        # end for
-    # end for
-# end train
-
-dataset = AirbnbNightlyPriceRegressionDataset()
-
-train_len = int(len(dataset)*0.8)      
-train_set, test_set = torch.utils.data.random_split(dataset, [train_len, len(dataset)-train_len])
-
-#dataloader = DataLoader(dataset, shuffle=True) #, batch_size=64)
-train_loader = DataLoader(train_set, shuffle=True, batch_size=4)
-test_loader = DataLoader(test_set, shuffle=True, batch_size=4)
-
-#for (X, y) in dataloader:
-#    print(X, y)
-#    print(X.shape, y.shape)
-
-train_len = int(len(train_set)*0.75)      
-train_set, validation_set = torch.utils.data.random_split(train_set, [train_len, 
-                                                                      len(train_set)-train_len])
-example = next(iter(train_loader))
-features, labels = example
-print(features)
-print(labels)
-
-model = LinearRegression()
-#print(model(features))
-
-epochs = 10
-train(model, train_loader, epochs)
