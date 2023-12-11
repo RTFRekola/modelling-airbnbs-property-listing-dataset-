@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Tue 21 Nov 2023 at 11:55 UT 
+Last modified on Mon 04 Dec 2023 at 21:15 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -17,6 +17,7 @@ import os
 import pandas as pd
 import typing
 
+from datetime import datetime
 from io import StringIO
 
 import inspect
@@ -148,7 +149,8 @@ def tune_regression_model_hyperparameters(model, hyperparameters):
 def save_model(folder, best_model, best_hyperparameter_values, performance_metrics):
 
     '''
-    This function writes model, hyperparameters and performance metrics into files. 
+    This function writes model, hyperparameters and performance metrics into files. First it 
+    tests whether the function input refers to neural network data or standalone test data.
 
     Variables: 
     - best_hyperparameter_values = best hyperparameter values, input with function call
@@ -157,7 +159,20 @@ def save_model(folder, best_model, best_hyperparameter_values, performance_metri
     - performance_matrics = performance metrics, input with function call
     '''
 
-    file_name = os.path.join(folder, 'model.joblib')
+    if (folder[-15:] == "neural_networks"):
+        datetime_now = datetime.now()
+        time_string = datetime_now.strftime("%Y-%m-%d_%H:%M:%S")
+        folder = os.path.join(folder, 'regression', time_string)
+        os.mkdir(folder)
+        best_model_file = 'model.pt'
+    elif(folder[-7:] == 'best_nn'):
+        folder = os.path.join('neural_networks', folder)
+        best_model_file = 'model.pt'
+    else:
+        best_model_file = 'model.joblib'
+    # end if
+
+    file_name = os.path.join(folder, best_model_file)
     joblib.dump(best_model, file_name)
     file_name = os.path.join(folder, 'hyperparameters.json')
     with open(file_name, 'w') as open_file:

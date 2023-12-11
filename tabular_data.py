@@ -149,13 +149,21 @@ def load_airbnb():
     else:
         df = pd.read_csv("../airbnb-local/tabular_data/clean_tabular_data.csv")
 
+        df_selection = df[["Price_Night", "guests", "beds", "bathrooms", 
+                           "Cleanliness_rating", "Accuracy_rating", 
+                           "Communication_rating", "Location_rating", 
+                           "Check-in_rating", "Value_rating", 
+                           "amenities_count", "bedrooms"]]
+        df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '']
+
+        ''' # Use this block when predicting "Category", the one above if "Price_Night"
         df_selection = df[["Category", "guests", "beds", "bathrooms", "Price_Night", 
                            "Cleanliness_rating", "Accuracy_rating", 
                            "Communication_rating", "Location_rating", 
                            "Check-in_rating", "Value_rating", 
                            "amenities_count", "bedrooms"]]
         df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '', '']
-
+        '''
         # change column type of these columns into numbers
         df[["Price_Night", "guests", "beds", "bathrooms", "Cleanliness_rating", 
             "Accuracy_rating", "Communication_rating", "Location_rating", 
@@ -167,11 +175,18 @@ def load_airbnb():
                                "amenities_count", 
                                "bedrooms"]].apply(pd.to_numeric)
 
+        labels_list = ["Price_Night", "guests", "beds", "bathrooms", 
+                       "Cleanliness_rating", "Accuracy_rating", 
+                       "Communication_rating", "Location_rating", 
+                       "Check-in_rating", "Value_rating", 
+                       "amenities_count", "bedrooms"]
+        ''' # Use this block when predicting "Category", the one above if "Price_Night"
         labels_list = ["Category", "Price_Night", "guests", "beds", "bathrooms", 
                        "Cleanliness_rating", "Accuracy_rating", 
                        "Communication_rating", "Location_rating", 
                        "Check-in_rating", "Value_rating", 
                        "amenities_count", "bedrooms"]
+        '''
         features_labels_tuple = (df_selection, labels_list)
     # end if        
     return features_labels_tuple

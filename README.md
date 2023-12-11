@@ -61,3 +61,48 @@ Read the numerical values data in as the data for machine learning models. Used 
 ### Classification Model Creation
 
 Imported Airbnb data with column "Category" as the label. Trained sklearn LogisticRegressor to predict the category from the data. Calculated the F1 score, precision score, recall score and accuracy score for both the training and test set. Performed grid search over a range of hyperparameters to find the best combination, with output consisting of the best model, the best hyperparameter values and the validation accuracy. Expanded the same to three more classifiers: DecisionTreeClassifier, RandomForestClassifier, and GradientBoostingClassifier. Implemented search for the best overall classification model. 
+
+### Configurable Neural Network Creation
+
+Initiated a PyTorch dataset with a tuple of <b><i>features</i></b> - the numerical values of the Airbnb data - and <b><i>label</i></b> - the price per night. Created a data shuffling dataloader for the train and test sets. Split the training set into train and validation sets. Defined a PyTorch model class for the neural network and a function to train the model. Had the training go through all of the data in batches and a number of epochs to optimise the model parameters. 
+
+Set up TensorBoard to visualise the behaviour of the tests. 
+
+Modified the code to read operational test parameters from a YAML file. These parameters include a set of optimisers, learning rates, hidden layer widths and model depths.
+Added functionality to save each of the tests in a separate folder of its own. The save data includes the RMSE loss, R^2 score, model training time, and prediction making time. 
+
+Ran through tests with a range of parameters and saved each in its own folder and the best separately in a specific folder reserved for the best model. The input parameters tested the neural networks with three different depths (2, 3 and 4) and three different widths (8, 12 and 16). For simplicity each of the hidden layers had the same width. Each of these variations was fed into three optimisers (SGD, Adagrad and Adam). Additionally three values of learning rate were tested (0.0001, 0.0002 and 0.0004). All the test values combined produced altogether 81 different variations. The neural network architecture schematics of the tested variations are shown graphically below. 
+
+![modelling-airbnbs-property-listing-dataset-](NNarchitecture.png?raw=true "Neural network architecture for all tested variations with two, three or four hidden layers, each with a width of either 8, 12 or 16.")
+
+Loss function behaviour in each of the tests was monitored with TensorBoard in VSC. The combined graphs of all 81 variations are shown below. 
+
+![modelling-airbnbs-property-listing-dataset-](All81.png?raw=true "Loss functions of all 81 tests.")
+
+To distinguish the quality of data between different optimisers, graphs containing only data from one of the three optimisers are given below.
+
+![modelling-airbnbs-property-listing-dataset-](SGD.png?raw=true "Loss functions of tests done with SGD optimiser.")
+![modelling-airbnbs-property-listing-dataset-](Adagrad.png?raw=true "Loss functions of tests done with Adagrad optimiser.")
+![modelling-airbnbs-property-listing-dataset-](Adam.png?raw=true "Loss functions of tests done with Adam optimiser.")
+
+While there are no noticeable differences between optimisers, the 12 test results with best observable decreasing nature of the loss function, regardless of the optimiser, were chosen for the graph below. Even though some of them rise initially, they all descend nicely towards the end. 
+
+![modelling-airbnbs-property-listing-dataset-](Best12.png?raw=true "Loss functions of the best 12 tests.")
+
+Using the TensorBoard functionality of ignoring outliers in the chart scaling, the results (below) are easier to see. 
+
+![modelling-airbnbs-property-listing-dataset-](Best12-excl_outliers.png?raw=true "Loss functions of the best 12 tests without outliers.")
+
+Using the TensorBoard functionality of smoothing, at the maximum setting, the results (below) are yet easier to see.
+
+![modelling-airbnbs-property-listing-dataset-](Best12-max_smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
+
+The best prediction was produced with Adagrad, using two hidden layers, each with a width of eight, and learning rate of 0.0001. The schematic is given below.
+
+![modelling-airbnbs-property-listing-dataset-](NN-2x8.png?raw=true "Network diagram for the best prediction, achieved at two hidden layers, both with a width of eight.")
+
+The loss function graph from Tensorboard for the best prediction is given below.
+
+![modelling-airbnbs-property-listing-dataset-](TheBest_Adagrad_8_2_1.png?raw=true "Loss function of the best prediction.")
+
+It is worth noting that the best model parameters are not identifying a trend of best values - at least insofar it comes to the set of 12 chosen best descending loss functions. While optimiser Adam was only present in 2 of the best 12 tests, the rest were roughly equally divided between SGD and Adagrad. The model depth was most commonly four, with only two depths of two in the set of 12. The hidden layer width and learning rate were both equally distributed between the three options of each.
