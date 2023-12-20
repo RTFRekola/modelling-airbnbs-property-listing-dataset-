@@ -28,23 +28,23 @@ Open a terminal and go to the directory where you installed the code. If you wan
 
 You may choose to have a specific location and name for your project directory. We can assume the location is in the home of user called <b>thisuser</b> and the directory to be called <b>airbnb</b>. Therefore your file structure would look like the following:
 
-<<b><i>airbnb</i></b>>
+<<b><i>airbnb</i></b>><br />
 &nbsp;&nbsp;&nbsp; |_ nn_config.yaml<br />
 &nbsp;&nbsp;&nbsp; |_ tabular_data.py<br />
 &nbsp;&nbsp;&nbsp; |_ modelling.py<br />
 &nbsp;&nbsp;&nbsp; |_ neural_networks.py<br />
 &nbsp;&nbsp;&nbsp; |_ copyright.txt<br />
 &nbsp;&nbsp;&nbsp; |_ <b><i>models</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><i>classification</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>logistic_regression</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><i>regression</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>linear_regression</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>classification</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>logistic_regression</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>linear_regression</i></b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
 &nbsp;&nbsp;&nbsp; |_ <b><i>neural_networks</i></b>><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>best_nn</i></b><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b><br />
