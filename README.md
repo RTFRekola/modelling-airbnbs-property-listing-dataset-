@@ -41,13 +41,13 @@ You may choose to have a specific location and name for your project directory. 
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>logistic_regression</i></b><br />
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b><br />
-&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b><br />
-&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
-&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>linear_regression</i></b><br />
-&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
+&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b><br />
+&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
+&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>linear_regression</i></b><br />
+&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
 &nbsp;&nbsp;&nbsp; |_ <b><i>neural_networks</i></b>><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>best_nn</i></b><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b><br />
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>best_nn</i></b><br />
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b><br />
 
 ## License Information
 
