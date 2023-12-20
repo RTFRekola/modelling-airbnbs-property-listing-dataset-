@@ -53,7 +53,7 @@ You may choose to have a specific location and name for your project directory. 
 
 Copyright 2023, Rami Rekola
 
-Copying and distribution of these files, with or without modification, are permitted in any medium without royalty, provided the copyright notice and this notice are preserved. This file is offered as-is, without any warranty.
+Copying and distribution of these files, with or without modification, are permitted in any medium without royalty, provided the copyright notice and this notice are preserved. These files is offered as-is, without any warranty.
 
 ## Project History
 
@@ -160,6 +160,6 @@ In fact, results with the number of bedrooms are so much better than the results
 ![modelling-airbnbs-property-listing-dataset-](img/b-Best12_smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
 
 The best prediction was produced with Adagrad, using four hidden layers, each with a width of twelve, and learning rate of 0.0002. 
-The loss function graph from Tensorboard for the best prediction is given below.
+The loss function graph from TensorBoard for the best prediction is given below.
 
 ![modelling-airbnbs-property-listing-dataset-](img/b-TheBest_Adagrad_12_4_2.png?raw=true "Loss function of the best prediction.")
