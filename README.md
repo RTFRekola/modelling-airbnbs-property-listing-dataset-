@@ -2,12 +2,12 @@
 Build a framework to systematically train, tune, and evaluate models on several tasks that are tackled by the Airbnb team. 
 
 ## Table of Contents
-1. [Project Description](#section-1)
-2. [Installation Instructions](#section-2)
-3. [Usage Instructions](#section-3)
-4. [File Structure](#section-4)
-5. [License Information](#section-5)
-6. [Project History](#section-6)
+1. [Project Description](#project-description)
+2. [Installation Instructions](#installation-instructions)
+3. [Usage Instructions](#usage-instructions)
+4. [File Structure](#file-structure)
+5. [License Information](#license-information)
+6. [Project History](#project-history)
 
 ## Project Description
 
@@ -29,6 +29,7 @@ Open a terminal and go to the directory where you installed the code. If you wan
 You may choose to have a specific location and name for your project directory. We can assume the location is in home dictionary and that the directory for the project exists in it and is called <b>airbnb</b>. Therefore your file structure, in your home folder, would look like the following (folders are shown in <b><i>bold italics</i></b>):
 
 <b><i>airbnb</i></b><br />
+&nbsp;&nbsp;&nbsp; |_ README.md<br />
 &nbsp;&nbsp;&nbsp; |_ nn_config.yaml<br />
 &nbsp;&nbsp;&nbsp; |_ tabular_data.py<br />
 &nbsp;&nbsp;&nbsp; |_ modelling.py<br />
