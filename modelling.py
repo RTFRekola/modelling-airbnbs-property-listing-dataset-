@@ -429,6 +429,7 @@ def find_best_model(task_folder):
     for one_of_files in range(len(score_file)):
         with open(score_file[one_of_files], 'r') as contents:
             metrics_value_test = float(json.loads(contents.read()).get('validation_accuracy'))
+            #metrics_value_test = float(json.loads(contents.read()).get('validation_score'))
         # end with
         if (metrics_value_test > metrics_value):
             metrics_value = metrics_value_test
@@ -513,7 +514,10 @@ def tune_classification_model_hyperparameters(model, hyperparameters):
     clf.fit(X_train, y_train)
     best_model = clf.best_estimator_
     best_params = clf.best_params_
+    #metrics_dict = {"validation_score": clf.best_score_}
     metrics_dict = {"validation_accuracy": clf.best_score_}
+    print('best_model = ', best_model)
+    print('validation_accuracy = ', clf.best_score_)
 
     # Save the model performance values
     folder = os.path.join("models", "classification", "logistic_regression")

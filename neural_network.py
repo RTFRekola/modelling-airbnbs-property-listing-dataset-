@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Tue 05 Dec 2023 at 19:42 UT 
+Last modified on Wed 20 Dec 2023 at 14:41 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -10,13 +10,13 @@ Modelling Airbnb's Property Listing Dataset
 ===========================================
 '''
 
-from datetime import datetime
 import numpy as np
 import os
 import pandas as pd
 import time
 import yaml
 
+from datetime import datetime
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.preprocessing import scale
 
@@ -75,7 +75,7 @@ class LinearRegression(torch.nn.Module):
     def __init__(self):
         super().__init__()
         # Initialise parameters.
-        self.linear_layer = torch.nn.Linear(11, 1)
+        self.linear_layer = torch.nn.Linear(12, 1)
 
     def __call__(self, features):
         # Use the layers of transformation to proceess the features.
@@ -110,7 +110,7 @@ class Neural_Network(torch.nn.Module):
         self.layers = torch.nn.Sequential(*self.get_net(self.i_width, self.i_depth))
 
     def get_net(self, i_width, i_depth):
-        layers = [torch.nn.Linear(11, self.config['hidden_layer_width'][i_width]), torch.nn.ReLU()]
+        layers = [torch.nn.Linear(12, self.config['hidden_layer_width'][i_width]), torch.nn.ReLU()]
         for step in range(self.config['model_depth'][i_depth]-1):
             layers.append(torch.nn.Linear(self.config['hidden_layer_width'][i_width], 
                                           self.config['hidden_layer_width'][i_width]))
@@ -298,6 +298,7 @@ Parameters:
 - df_in = Pandas dataframe with Airbnb data in it
 - df = Pandas dataframe, where "Category" values have been converted into numerical values
 - model = chosen model for neural network
+- run_type = a flag to choose between two options
 - test_loader = dataloader for the test set
 - test_set = test set for neural network
 - train_len = desired fraction of the length of dataset for training set divisions
@@ -313,15 +314,13 @@ features_labels_tuple = load_airbnb()
 
 # Using sklearn to train a linear regression model to predict first 
 # the "Price_Night" and then the "Category" feature from the tabular data.
-df_in = features_labels_tuple[0]
-df = df_in.replace(['Treehouses', 'Category', 'Chalets', 'Amazing pools', 'Offbeat', 'Beachfront'],
-                   [1, 1, 2, 3, 4, 5])
+df = features_labels_tuple[0]
 X = df.iloc[:, 1:]
 y = df.iloc[:, 0]
 X = scale(X)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 #X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.25)
-
+print(df.dtypes)
 if __name__ == '__main__':
     # Load hyperparameters from file.
     config = get_nn_config()
@@ -343,31 +342,34 @@ if __name__ == '__main__':
     # Prepare the features and labels for the neural network model.
     example = next(iter(train_loader))
     features, labels = example
-    '''
+
     # Instantiate the model and train it both for training set and validation set
     model = LinearRegression()
     epochs = 10
-    train(model, train_loader, epochs, config)
+    train(model, train_loader, epochs, config, 0, 0)
     validation_loader = DataLoader(validation_set, shuffle=True, batch_size=128)
-    train(model, validation_loader, epochs, config)
-    '''
-    # Instantiate neural network model and train it for a training set with a selection of 
-    # hyperparameters. Save results of each run.
+    train(model, validation_loader, epochs, config, 0, 0)
 
-    '''
-    epochs = 10
-    model = Neural_Network(config, 1, 1)
-    grid = GridSearchCV(estimator=model, param_grid=config)
-    grid_result = grid.fit(X_train, y_train)
-    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
-    means = grid_result.cv_results_['mean_test_score']
-    stds = grid_result.cv_results_['std_test_score']
-    params = grid_result.cv_results_['params']
-    for mean, stdev, param in zip(means, stds, params):
-        print("%f (%f) with: %r" % (mean, stdev, param))
-    '''
-
-    find_best_nn(config)
+    # Run tests on the data, uncomment one of the lines below, comment the other one
+    #run_type = "individual"
+    run_type = "neural_network"
+    if (run_type = "individual"):
+        # Use this for individual test runs; the following "find_best_nn" is for complex runs
+        epochs = 10
+        model = Neural_Network(config, 1, 1)
+        grid = GridSearchCV(estimator=model, param_grid=config)
+        grid_result = grid.fit(X_train, y_train)
+        print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+        means = grid_result.cv_results_['mean_test_score']
+        stds = grid_result.cv_results_['std_test_score']
+        params = grid_result.cv_results_['params']
+        for mean, stdev, param in zip(means, stds, params):
+            print("%f (%f) with: %r" % (mean, stdev, param))
+    elif (run_type = "neural_network"):
+        # Instantiate neural network model and train it for a training set with a selection of 
+        # hyperparameters. Save results of each run.
+        find_best_nn(config)
+    # end if
 # end if
 
 ### end programme

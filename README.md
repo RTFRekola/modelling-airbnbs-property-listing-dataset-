@@ -11,13 +11,49 @@ Build a framework to systematically train, tune, and evaluate models on several 
 
 ## Project Description
 
+This is a project in which a typical selection of Airbnb accommodation data was used for creating a set of machine learning models and neural networks in order to make predictions based on the data. The project consisted of writing Python 3 code to perform the aforementioned tasks and displaying graphical and numeric data on the results. 
+
 ## Installation Instructions
+
+When preparing to run this code for the first time, do the following:
+- create a directory for the code; e.g. in Linux terminal <b>mkdir airbnb</b>
+- copy files <b><i>neural_network.py</i></b>, <b><i>modelling.py</i></b>, <b><i>tabular_data.py</i></b>, <b><i>nn_config.yalm</i></b>, and <b><i>copyright.txt</i></b> into the dictionary you just created
+- go to this directory and create the following directories (see also "file structure" below) in it; e.g. in Linux terminal <b>mkdir models models/classification models/classification/decision_tree models/classification/gradient_boosting models/classification/logistic_regression models/classification/random/forest models/regression models/regression/decision_tree models/regression/gradient_boosting models/regression/linear_regression models/regression/random_forest neural_networks neural_networks/best_nn neural_networks/regression</b>
 
 ## Usage Instructions
 
+Open a terminal and go to the directory where you installed the code. If you want to test a series of regression and classification machine learning models, run <b>python3 modelling.py</b> and check the contents of the directory <b><i>models</i></b> for results. If you want to test neural networks, run <b>python3 neural_network.py</b> and check the contents of the directory <b><i>neural_networks</i></b> for results. Once run, the folders in <b><i>models/classification</i></b> and <b><i>models/regression</i></b> will have files in them. Similarly the there will be folders named with the day and time of the run in <b><i>neural_networks/regression</i></b>, which contain files with results of the run. The files in these folders contain the best model, the hyperparameters used in this case, and the loss or score of the run with these hyperparameters. 
+
 ## File Structure
 
+You may choose to have a specific location and name for your project directory. We can assume the location is in the home of user called <b>thisuser</b> and the directory to be called <b>airbnb</b>. Therefore your file structure would look like the following:
+
+<<b><i>airbnb</i></b>>
+&nbsp;&nbsp;&nbsp; |_ nn_config.yaml
+&nbsp;&nbsp;&nbsp; |_ tabular_data.py
+&nbsp;&nbsp;&nbsp; |_ modelling.py
+&nbsp;&nbsp;&nbsp; |_ neural_networks.py
+&nbsp;&nbsp;&nbsp; |_ copyright.txt
+&nbsp;&nbsp;&nbsp; |_ <b><i>models</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><i>classification</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>logistic_regression</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><i>regression</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>decision_tree</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>linear_regression</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b>
+&nbsp;&nbsp;&nbsp; |_ <b><i>neural_networks</i></b>>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>best_nn</i></b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b>
+
 ## License Information
+
+Copyright 2023, Rami Rekola
+
+Copying and distribution of these files, with or without modification, are permitted in any medium without royalty, provided the copyright notice and this notice are preserved. This file is offered as-is, without any warranty.
 
 ## Project History
 
@@ -64,6 +100,8 @@ Imported Airbnb data with column "Category" as the label. Trained sklearn Logist
 
 ### Configurable Neural Network Creation
 
+#### First model - price per night as the label
+
 Initiated a PyTorch dataset with a tuple of <b><i>features</i></b> - the numerical values of the Airbnb data - and <b><i>label</i></b> - the price per night. Created a data shuffling dataloader for the train and test sets. Split the training set into train and validation sets. Defined a PyTorch model class for the neural network and a function to train the model. Had the training go through all of the data in batches and a number of epochs to optimise the model parameters. 
 
 Set up TensorBoard to visualise the behaviour of the tests. 
@@ -79,7 +117,7 @@ Loss function behaviour in each of the tests was monitored with TensorBoard in V
 
 ![modelling-airbnbs-property-listing-dataset-](All81.png?raw=true "Loss functions of all 81 tests.")
 
-To distinguish the quality of data between different optimisers, graphs containing only data from one of the three optimisers are given below.
+To distinguish the quality of data between different optimisers, graphs containing only data from one of the three optimisers are given below (top: SGD, middle: Adagrad, bottow: Adam).
 
 ![modelling-airbnbs-property-listing-dataset-](SGD.png?raw=true "Loss functions of tests done with SGD optimiser.")
 ![modelling-airbnbs-property-listing-dataset-](Adagrad.png?raw=true "Loss functions of tests done with Adagrad optimiser.")
@@ -105,4 +143,23 @@ The loss function graph from Tensorboard for the best prediction is given below.
 
 ![modelling-airbnbs-property-listing-dataset-](TheBest_Adagrad_8_2_1.png?raw=true "Loss function of the best prediction.")
 
-It is worth noting that the best model parameters are not identifying a trend of best values - at least insofar it comes to the set of 12 chosen best descending loss functions. While optimiser Adam was only present in 2 of the best 12 tests, the rest were roughly equally divided between SGD and Adagrad. The model depth was most commonly four, with only two depths of two in the set of 12. The hidden layer width and learning rate were both equally distributed between the three options of each.
+It is worth noting that the best model parameters are not identifying a trend of best values - at least if compared to the set of 12 chosen best descending loss functions. While optimiser Adam was only present in 2 of the best 12 tests, the rest were roughly equally divided between SGD and Adagrad. The model depth was most commonly four, with only two depths of two in the set of 12. The hidden layer width and learning rate were both equally distributed between the three options of each.
+
+#### Second model - number of bedrooms as the label
+
+The same code as above was run again, but this time the label was changed from the price per night to the number of bedrooms. Again, each optimiser had good and not so good results for various parameters. Adagrad had fewer good ones, but that may be statistically insignificant - especially since the best test run was made with Adagrad. Unlike with the price per night results, there was a clear trend with the number of bedroom results favouring higher number of hidden layer widths and smaller number of hidden layers. Also higher learning rate values seemed to produce better results. All the 81 results are shown as a TensorBoard graph below. 
+
+![modelling-airbnbs-property-listing-dataset-](b-All81.png?raw=true "Loss functions of all 81 tests.")
+
+Again, the 12 cases with clearest decreasing nature of the loss function were selected for a graph of their own, below. 
+
+![modelling-airbnbs-property-listing-dataset-](b-Best12.png?raw=true "Loss functions of the best 12 tests.")
+
+In fact, results with the number of bedrooms are so much better than the results with the price per night that outliers were not excluded. Instead the graph for the best 12 cases was smoothed maximally in TensorBoard, below. 
+
+![modelling-airbnbs-property-listing-dataset-](b-Best12-smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
+
+The best prediction was produced with Adagrad, using four hidden layers, each with a width of twelve, and learning rate of 0.0002. 
+The loss function graph from Tensorboard for the best prediction is given below.
+
+![modelling-airbnbs-property-listing-dataset-](b-TheBest_Adagrad_12_4_2.png?raw=true "Loss function of the best prediction.")
