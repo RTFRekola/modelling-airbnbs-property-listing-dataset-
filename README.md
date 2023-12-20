@@ -111,37 +111,37 @@ Added functionality to save each of the tests in a separate folder of its own. T
 
 Ran through tests with a range of parameters and saved each in its own folder and the best separately in a specific folder reserved for the best model. The input parameters tested the neural networks with three different depths (2, 3 and 4) and three different widths (8, 12 and 16). For simplicity each of the hidden layers had the same width. Each of these variations was fed into three optimisers (SGD, Adagrad and Adam). Additionally three values of learning rate were tested (0.0001, 0.0002 and 0.0004). All the test values combined produced altogether 81 different variations. The neural network architecture schematics of the tested variations are shown graphically below. 
 
-![modelling-airbnbs-property-listing-dataset-](NNarchitecture.png?raw=true "Neural network architecture for all tested variations with two, three or four hidden layers, each with a width of either 8, 12 or 16.")
+![modelling-airbnbs-property-listing-dataset-](img/NNarchitecture.png?raw=true "Neural network architecture for all tested variations with two, three or four hidden layers, each with a width of either 8, 12 or 16.")
 
 Loss function behaviour in each of the tests was monitored with TensorBoard in VSC. The combined graphs of all 81 variations are shown below. 
 
-![modelling-airbnbs-property-listing-dataset-](All81.png?raw=true "Loss functions of all 81 tests.")
+![modelling-airbnbs-property-listing-dataset-](img/All81.png?raw=true "Loss functions of all 81 tests.")
 
 To distinguish the quality of data between different optimisers, graphs containing only data from one of the three optimisers are given below (top: SGD, middle: Adagrad, bottow: Adam).
 
-![modelling-airbnbs-property-listing-dataset-](SGD.png?raw=true "Loss functions of tests done with SGD optimiser.")
-![modelling-airbnbs-property-listing-dataset-](Adagrad.png?raw=true "Loss functions of tests done with Adagrad optimiser.")
-![modelling-airbnbs-property-listing-dataset-](Adam.png?raw=true "Loss functions of tests done with Adam optimiser.")
+![modelling-airbnbs-property-listing-dataset-](img/SGD.png?raw=true "Loss functions of tests done with SGD optimiser.")
+![modelling-airbnbs-property-listing-dataset-](img/Adagrad.png?raw=true "Loss functions of tests done with Adagrad optimiser.")
+![modelling-airbnbs-property-listing-dataset-](img/Adam.png?raw=true "Loss functions of tests done with Adam optimiser.")
 
 While there are no noticeable differences between optimisers, the 12 test results with best observable decreasing nature of the loss function, regardless of the optimiser, were chosen for the graph below. Even though some of them rise initially, they all descend nicely towards the end. 
 
-![modelling-airbnbs-property-listing-dataset-](Best12.png?raw=true "Loss functions of the best 12 tests.")
+![modelling-airbnbs-property-listing-dataset-](img/Best12.png?raw=true "Loss functions of the best 12 tests.")
 
 Using the TensorBoard functionality of ignoring outliers in the chart scaling, the results (below) are easier to see. 
 
-![modelling-airbnbs-property-listing-dataset-](Best12-excl_outliers.png?raw=true "Loss functions of the best 12 tests without outliers.")
+![modelling-airbnbs-property-listing-dataset-](img/Best12-excl_outliers.png?raw=true "Loss functions of the best 12 tests without outliers.")
 
 Using the TensorBoard functionality of smoothing, at the maximum setting, the results (below) are yet easier to see.
 
-![modelling-airbnbs-property-listing-dataset-](Best12-max_smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
+![modelling-airbnbs-property-listing-dataset-](img/Best12-max_smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
 
 The best prediction was produced with Adagrad, using two hidden layers, each with a width of eight, and learning rate of 0.0001. The schematic is given below.
 
-![modelling-airbnbs-property-listing-dataset-](NN-2x8.png?raw=true "Network diagram for the best prediction, achieved at two hidden layers, both with a width of eight.")
+![modelling-airbnbs-property-listing-dataset-](img/NN-2x8.png?raw=true "Network diagram for the best prediction, achieved at two hidden layers, both with a width of eight.")
 
 The loss function graph from Tensorboard for the best prediction is given below.
 
-![modelling-airbnbs-property-listing-dataset-](TheBest_Adagrad_8_2_1.png?raw=true "Loss function of the best prediction.")
+![modelling-airbnbs-property-listing-dataset-](img/TheBest_Adagrad_8_2_1.png?raw=true "Loss function of the best prediction.")
 
 It is worth noting that the best model parameters are not identifying a trend of best values - at least if compared to the set of 12 chosen best descending loss functions. While optimiser Adam was only present in 2 of the best 12 tests, the rest were roughly equally divided between SGD and Adagrad. The model depth was most commonly four, with only two depths of two in the set of 12. The hidden layer width and learning rate were both equally distributed between the three options of each.
 
@@ -149,17 +149,17 @@ It is worth noting that the best model parameters are not identifying a trend of
 
 The same code as above was run again, but this time the label was changed from the price per night to the number of bedrooms. Again, each optimiser had good and not so good results for various parameters. Adagrad had fewer good ones, but that may be statistically insignificant - especially since the best test run was made with Adagrad. Unlike with the price per night results, there was a clear trend with the number of bedroom results favouring higher number of hidden layer widths and smaller number of hidden layers. Also higher learning rate values seemed to produce better results. All the 81 results are shown as a TensorBoard graph below. 
 
-![modelling-airbnbs-property-listing-dataset-](b-All81.png?raw=true "Loss functions of all 81 tests.")
+![modelling-airbnbs-property-listing-dataset-](img/b-All81.png?raw=true "Loss functions of all 81 tests.")
 
 Again, the 12 cases with clearest decreasing nature of the loss function were selected for a graph of their own, below. 
 
-![modelling-airbnbs-property-listing-dataset-](b-Best12.png?raw=true "Loss functions of the best 12 tests.")
+![modelling-airbnbs-property-listing-dataset-](img/b-Best12.png?raw=true "Loss functions of the best 12 tests.")
 
 In fact, results with the number of bedrooms are so much better than the results with the price per night that outliers were not excluded. Instead the graph for the best 12 cases was smoothed maximally in TensorBoard, below. 
 
-![modelling-airbnbs-property-listing-dataset-](b-Best12-smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
+![modelling-airbnbs-property-listing-dataset-](img/b-Best12_smooth.png?raw=true "Loss functions of the best 12 tests with maximum smoothing.")
 
 The best prediction was produced with Adagrad, using four hidden layers, each with a width of twelve, and learning rate of 0.0002. 
 The loss function graph from Tensorboard for the best prediction is given below.
 
-![modelling-airbnbs-property-listing-dataset-](b-TheBest_Adagrad_12_4_2.png?raw=true "Loss function of the best prediction.")
+![modelling-airbnbs-property-listing-dataset-](img/b-TheBest_Adagrad_12_4_2.png?raw=true "Loss function of the best prediction.")
