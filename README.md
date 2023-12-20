@@ -26,9 +26,9 @@ Open a terminal and go to the directory where you installed the code. If you wan
 
 ## File Structure
 
-You may choose to have a specific location and name for your project directory. We can assume the location is in home dictionary and that the directory for the project exists in it and is called <b>airbnb</b>. Therefore your file structure, in your home folder, would look like the following (folders are shown in bold italics):
+You may choose to have a specific location and name for your project directory. We can assume the location is in home dictionary and that the directory for the project exists in it and is called <b>airbnb</b>. Therefore your file structure, in your home folder, would look like the following (folders are shown in <b><i>bold italics</i></b>):
 
-<<b><i>airbnb</i></b>><br />
+<b><i>airbnb</i></b><br />
 &nbsp;&nbsp;&nbsp; |_ nn_config.yaml<br />
 &nbsp;&nbsp;&nbsp; |_ tabular_data.py<br />
 &nbsp;&nbsp;&nbsp; |_ modelling.py<br />
@@ -45,7 +45,7 @@ You may choose to have a specific location and name for your project directory. 
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>gradient_boosting</i></b><br />
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>linear_regression</i></b><br />
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>random_forest</i></b><br />
-&nbsp;&nbsp;&nbsp; |_ <b><i>neural_networks</i></b>><br />
+&nbsp;&nbsp;&nbsp; |_ <b><i>neural_networks</i></b><br />
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>best_nn</i></b><br />
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; |_ <b><i>regression</i></b><br />
 
