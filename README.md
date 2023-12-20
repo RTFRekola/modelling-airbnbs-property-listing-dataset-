@@ -53,7 +53,7 @@ You may choose to have a specific location and name for your project directory. 
 
 Copyright 2023, Rami Rekola
 
-Copying and distribution of these files, with or without modification, are permitted in any medium without royalty, provided the copyright notice and this notice are preserved. These files is offered as-is, without any warranty.
+Copying and distribution of these files, with or without modification, are permitted in any medium without royalty, provided the copyright notice and this notice are preserved. These files are offered as-is, without any warranty.
 
 ## Project History
 
@@ -117,7 +117,7 @@ Loss function behaviour in each of the tests was monitored with TensorBoard in V
 
 ![modelling-airbnbs-property-listing-dataset-](img/All81.png?raw=true "Loss functions of all 81 tests.")
 
-To distinguish the quality of data between different optimisers, graphs containing only data from one of the three optimisers are given below (top: SGD, middle: Adagrad, bottow: Adam).
+To distinguish the quality of data between different optimisers, graphs containing only data from one of the three optimisers are given below (top: SGD, middle: Adagrad, bottom: Adam).
 
 ![modelling-airbnbs-property-listing-dataset-](img/SGD.png?raw=true "Loss functions of tests done with SGD optimiser.")
 ![modelling-airbnbs-property-listing-dataset-](img/Adagrad.png?raw=true "Loss functions of tests done with Adagrad optimiser.")
@@ -139,7 +139,7 @@ The best prediction was produced with Adagrad, using two hidden layers, each wit
 
 ![modelling-airbnbs-property-listing-dataset-](img/NN-2x8.png?raw=true "Network diagram for the best prediction, achieved at two hidden layers, both with a width of eight.")
 
-The loss function graph from Tensorboard for the best prediction is given below.
+The loss function graph from TensorBoard for the best prediction is given below.
 
 ![modelling-airbnbs-property-listing-dataset-](img/TheBest_Adagrad_8_2_1.png?raw=true "Loss function of the best prediction.")
 
