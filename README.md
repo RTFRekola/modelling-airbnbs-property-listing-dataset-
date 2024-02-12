@@ -166,7 +166,7 @@ The same code as above was run one more time. This time the label was set to the
 
 The best prediction was produced with Adam, using two hidden layers, each with a width of 16, and learning rate of 0.0004. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/Category-12x6.png?raw=true "Best neural network for 'Category'.")
+![modelling-airbnbs-property-listing-dataset-](img/Category-2x16.png?raw=true "Best neural network for 'Category'.")
 
 Best optimisers and the hyperparameters used to get the best results in each of the three cases above (values rounded to 4 significant decimal places):
 
