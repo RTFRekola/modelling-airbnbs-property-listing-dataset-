@@ -121,9 +121,7 @@ Both classification and regression models could potentially be improved by going
 
 ### Configurable Neural Network Creation
 
-#### First model - price per night as the label
-
-Initiated a PyTorch dataset with a tuple of <b><i>features</i></b> - the numerical values of the Airbnb data - and <b><i>label</i></b> - the price per night. Created a data shuffling dataloader for the train and test sets. Split the training set into train and validation sets. Defined a PyTorch model class for the neural network and a function to train the model. The model, the data loader and the number of epochs were fed into the training function, which then iterates through every batch in the dataset for the given number of epochs and optimises the model parameters. 
+Initiated a PyTorch dataset with a tuple of <b><i>features</i></b> - the numerical values of the Airbnb data - and <b><i>label</i></b>. Created a data shuffling dataloader for the train and test sets. Split the training set into train and validation sets. Defined a PyTorch model class for the neural network and a function to train the model. The model, the data loader and the number of epochs were fed into the training function, which then iterates through every batch in the dataset for the given number of epochs and optimises the model parameters. 
 
 Set up TensorBoard to visualise the behaviour of the tests. 
 
@@ -138,13 +136,15 @@ Ran through tests with a range of parameters and saved each in its own folder an
 
 ![modelling-airbnbs-property-listing-dataset-](img/NNarchitecture.png?raw=true "Neural network architecture for all tested variations with two, three or four hidden layers, each with a width of either 8, 12 or 16.")
 
-Loss function behaviour in each of the tests was monitored with TensorBoard in VSC. The combined graphs of the best 15 variations are shown below. TensorBoard smoothing was set to value 0.80.
+#### First model - price per night as the label
+
+The test setting described above was first run with Price_Night as the label. Loss function behaviour in each of the tests was monitored with TensorBoard in VSC. The combined graphs of the best 15 variations are shown below. TensorBoard smoothing was set to value 0.80.
 
 ![modelling-airbnbs-property-listing-dataset-](img/TB-Price_Night.png?raw=true "Loss functions of the best 15 tests.")
 
 The best prediction was produced with Adagrad, using two hidden layers, each with a width of 12, and learning rate of 0.0001. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/Price_Night-12x2.png?raw=true "Best neural network for 'Price_Night'.")
+![modelling-airbnbs-property-listing-dataset-](img/Price_Night-2x12.png?raw=true "Best neural network for 'Price_Night'.")
 
 It is worth noting that the best model parameters are not identifying a trend of best values - at least if compared to the set of 12 chosen best descending loss functions. While optimiser Adam was only present in 2 of the best 12 tests, the rest were roughly equally divided between SGD and Adagrad. The model depth was most commonly four, with only two depths of two in the set of 12. The hidden layer width and learning rate were both equally distributed between the three options of each.
 
@@ -156,7 +156,7 @@ The same code as above was run again, but this time the label was changed from t
 
 The best prediction was produced with Adagrad, using three hidden layers, each with a width of eight, and learning rate of 0.0004. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/bedrooms-8x3.png?raw=true "Best neural network for 'bedrooms'.")
+![modelling-airbnbs-property-listing-dataset-](img/bedrooms-3x8.png?raw=true "Best neural network for 'bedrooms'.")
 
 #### Third model - category as the label
 
@@ -166,7 +166,7 @@ The same code as above was run one more time. This time the label was set to the
 
 The best prediction was produced with Adam, using two hidden layers, each with a width of 16, and learning rate of 0.0004. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/Category-16x2.png?raw=true "Best neural network for 'Category'.")
+![modelling-airbnbs-property-listing-dataset-](img/Category-12x6.png?raw=true "Best neural network for 'Category'.")
 
 Best optimisers and the hyperparameters used to get the best results in each of the three cases above (values rounded to 4 significant decimal places):
 
