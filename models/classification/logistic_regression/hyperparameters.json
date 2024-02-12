@@ -1,1 +1,1 @@
-{"criterion": "friedman_mse", "min_samples_leaf": 1, "n_estimators": 10}
+{"C": 1, "max_iter": 10, "solver": "newton-cg"}

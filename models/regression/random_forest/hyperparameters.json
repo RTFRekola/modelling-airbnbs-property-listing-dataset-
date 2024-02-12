@@ -1,1 +1,1 @@
-{"criterion": "friedman_mse", "min_samples_leaf": 2, "n_estimators": 100}
+{"bootstrap": true, "criterion": "squared_error", "min_samples_leaf": 1, "n_estimators": 400}

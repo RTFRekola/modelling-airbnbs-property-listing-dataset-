@@ -1,0 +1,3 @@
+Copyright 2023, Rami Rekola
+
+Copying and distribution of these files, with or without modification, are permitted in any medium without royalty, provided the copyright notice and this notice are preserved. These files are offered as-is, without any warranty.

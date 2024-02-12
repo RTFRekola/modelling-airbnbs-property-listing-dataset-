@@ -1,1 +1,1 @@
-{"loss": "squared_error", "min_samples_leaf": 1, "n_estimators": 50}
+{"learning_rate": 0.1, "loss": "squared_error", "min_samples_leaf": 1, "n_estimators": 50}

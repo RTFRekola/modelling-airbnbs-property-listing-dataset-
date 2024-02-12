@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Mon 12 Jun 2023 at 18:36 UT
-Last modified on Tue 7 Nov 2023 at 19:58 UT
+Last modified on Sat 13 Jan 2024 at 16:33 UT
 
 @author: Rami T. F. Rekola 
 
@@ -10,8 +10,8 @@ Modelling Airbnb's Property Listing Dataset
 ===========================================
 '''
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 # ==============================================
@@ -23,8 +23,8 @@ def clean_tabular_data(df):
     '''
     Load a csv file, fix the data, and save the clean data as a new file.
 
-    Variables: 
-    - df = Pandas dataframe with the data, input with function call, return fixed.
+    Input and return variable: 
+    - df = Pandas dataframe with the data
     '''
 
     def fix_shifted_rows(df):
@@ -32,8 +32,8 @@ def clean_tabular_data(df):
         '''
         Move shifted data to correct place, or, rather, remove the bad row.
 
-        Variables: 
-        - df = Pandas dataframe with the data, input with function call, return fixed
+        Input and return variable: 
+        - df = Pandas dataframe with the data
         '''
 
         # Remove the one problematic row.
@@ -47,16 +47,16 @@ def clean_tabular_data(df):
         '''
         Remove rows with missing values in ratings columns.
 
-        Variables: 
-        - df = Pandas dataframe with the data, input with function call, return fixed
+        Input and return variable: 
+        - df = Pandas dataframe with the data
         '''
 
-        df = df.dropna(subset=['Cleanliness_rating'])
-        df = df.dropna(subset=['Accuracy_rating'])
-        df = df.dropna(subset=['Communication_rating'])
-        df = df.dropna(subset=['Location_rating'])
-        df = df.dropna(subset=['Check-in_rating'])
-        df = df.dropna(subset=['Value_rating'])
+        drop_list = ['Cleanliness_rating', 'Accuracy_rating',
+                     'Communication_rating', 'Location_rating', 
+                     'Check-in_rating', 'Value_rating']
+        for item in drop_list:
+            df = df.dropna(subset=[item])
+        # end for
         return df
     # end remove_rows_with_missing_ratings
 
@@ -68,13 +68,12 @@ def clean_tabular_data(df):
         Remove empty items and convert carriage returns into single whitespaces.
         Merge list items into the same string. 
 
-        Variables: 
-        - df = Pandas dataframe with the data, input with function call, return fixed
+        Input and return variable: 
+        - df = Pandas dataframe with the data
         '''
 
         def make_corrections(description_in):
-            description_in_progress_11 = description_in.replace("'About this space', ", 
-                                                      "")
+            description_in_progress_11 = description_in.replace("'About this space', ", "")
             description_in_progress_2 = description_in_progress_11.replace("', '", "")
             description_in_progress_3 = description_in_progress_2.replace('\\n', ' ')
             description_in_progress_4 = description_in_progress_3.strip()
@@ -82,6 +81,7 @@ def clean_tabular_data(df):
                                replace('["', '').replace('"]', '').
                                replace("']", ""))
             return description_out
+
         # make_corrections
         df = df.dropna(subset=['Description'])
         df['Description'] = df.apply(lambda row: 
@@ -96,100 +96,92 @@ def clean_tabular_data(df):
         '''
         Replace empty values with a unity in selected columns. 
 
-        Variables: 
-        - df = Pandas dataframe with the data, input with function call, return fixed
+        Input and return variable: 
+        - df = Pandas dataframe with the data
         '''
 
-        df['guests'] = df['guests'].fillna(1)
-        df['beds'] = df['beds'].fillna(1)
-        df['bathrooms'] = df['bathrooms'].fillna(1)
-        df['bedrooms'] = df['bedrooms'].fillna(1)
+        fill_list = ['guests', 'beds', 'bathrooms', 'bedrooms']
+        for item in fill_list:
+            df[item] = df[item].fillna(1)
+        # end for
         return df
     # end set_default_feature_values
 
     # Fix shifted rows
     df = fix_shifted_rows(df)
-
     # Remove rows with missing rating values
     df = remove_rows_with_missing_ratings(df)
-
     # Merge list items into one string
     df = combine_description_strings(df)
-
     # Replace empty values with 1 in selected columns.
     df = set_default_feature_values(df)
     return df
 # end clean_tabular_data
 
 
-def load_airbnb():
+def load_airbnb(in_label):
 
     '''
     Return all numerical values, or features, as a pandas dataframe and their
     headers, or labels, as a list in the tuple format (features, labels)
 
-    Variables: 
+    Input variable:
+    - in_label = the database column to be used as the label
+
+    Internal variables: 
     - df = Pandas dataframe with the data, read in from a file
     - df_selection = Pandas dataframe with selected columns of the original df
     - labels_list = list of dataframe column headers
-    - features_labels_tuple = tuple with selected dataframe data and column headers in it, returned
+
+    Return variable:
+    - features_labels_tuple = tuple with selected dataframe data and column 
+                              headers in it
     '''
 
-    if __name__ == "__main__":
-
-        # Load data from a CSV file into a Pandas DataFrame
-        df = pd.read_csv("../airbnb-local/tabular_data/listing.csv")
-
-        # Clean the data
-        df = clean_tabular_data()
-
-        # Save processed data from a Pandas DataFrame into a CSV file
-        df.to_csv("../airbnb-local/tabular_data/clean_tabular_data.csv", 
-                  encoding='utf-8', index=False)
-    else:
-        df = pd.read_csv("../airbnb-local/tabular_data/clean_tabular_data.csv")
-
-        df_selection = df[["Price_Night", "guests", "beds", "bathrooms", 
+    df = pd.read_csv("../airbnb-local/tabular_data/clean_tabular_data.csv")
+    # Change column type of these columns into numbers
+    df[["Price_Night", "guests", "beds", "bathrooms", "Cleanliness_rating", 
+        "Accuracy_rating", "Communication_rating", "Location_rating", 
+        "Check-in_rating", "Value_rating", "amenities_count", 
+        "bedrooms"]] = df[["guests", "beds", "bathrooms", "Price_Night", 
                            "Cleanliness_rating", "Accuracy_rating", 
                            "Communication_rating", "Location_rating", 
                            "Check-in_rating", "Value_rating", 
-                           "amenities_count", "bedrooms"]]
-        df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '']
-
-        ''' # Use this block when predicting "Category", the one above if "Price_Night"
-        df_selection = df[["Category", "guests", "beds", "bathrooms", "Price_Night", 
-                           "Cleanliness_rating", "Accuracy_rating", 
-                           "Communication_rating", "Location_rating", 
-                           "Check-in_rating", "Value_rating", 
-                           "amenities_count", "bedrooms"]]
-        df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '', '']
-        '''
-        # change column type of these columns into numbers
-        df[["Price_Night", "guests", "beds", "bathrooms", "Cleanliness_rating", 
-            "Accuracy_rating", "Communication_rating", "Location_rating", 
-            "Check-in_rating", "Value_rating", "amenities_count", 
-            "bedrooms"]] = df[["guests", "beds", "bathrooms", "Price_Night", 
-                               "Cleanliness_rating", "Accuracy_rating", 
-                               "Communication_rating", "Location_rating", 
-                               "Check-in_rating", "Value_rating", 
-                               "amenities_count", 
-                               "bedrooms"]].apply(pd.to_numeric)
-
-        labels_list = ["Price_Night", "guests", "beds", "bathrooms", 
-                       "Cleanliness_rating", "Accuracy_rating", 
-                       "Communication_rating", "Location_rating", 
-                       "Check-in_rating", "Value_rating", 
-                       "amenities_count", "bedrooms"]
-        ''' # Use this block when predicting "Category", the one above if "Price_Night"
-        labels_list = ["Category", "Price_Night", "guests", "beds", "bathrooms", 
-                       "Cleanliness_rating", "Accuracy_rating", 
-                       "Communication_rating", "Location_rating", 
-                       "Check-in_rating", "Value_rating", 
-                       "amenities_count", "bedrooms"]
-        '''
-        features_labels_tuple = (df_selection, labels_list)
+                           "amenities_count", 
+                           "bedrooms"]].apply(pd.to_numeric)
+    labels_list = [in_label, "guests", "beds", "bathrooms", 
+                   "Cleanliness_rating", "Accuracy_rating", 
+                   "Communication_rating", "Location_rating", 
+                   "Check-in_rating", "Value_rating", "amenities_count"]
+    if (in_label == "Price_Night"):
+        labels_list.append("bedrooms")
+        labels_list.append("Category")
+    elif (in_label == "Category"):
+        labels_list.append("Price_Night")
+        labels_list.append("bedrooms")
+    elif (in_label == "bedrooms"):
+        labels_list.append("Price_Night")
+        labels_list.append("Category")
+    # end if
+    df_selection = df[labels_list]
+    df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', '', '']
+    df_selection = df_selection.replace(['Treehouses', 'Category', 'Chalets', 
+                                         'Amazing pools', 'Offbeat', 
+                                         'Beachfront'], 
+                                        [1, 1, 2, 3, 4, 5])
+    features_labels_tuple = (df_selection, labels_list)
     # end if        
     return features_labels_tuple
 # end load_airbnb
+
+if __name__ == "__main__":
+    # Load data from a CSV file into a Pandas DataFrame
+    df = pd.read_csv("../airbnb-local/tabular_data/listing.csv")
+    # Clean the data
+    df = clean_tabular_data()
+    # Save processed data from a Pandas DataFrame into a CSV file
+    df.to_csv("../airbnb-local/tabular_data/clean_tabular_data.csv", 
+              encoding='utf-8', index=False)
+# end if
 
 # end programme
