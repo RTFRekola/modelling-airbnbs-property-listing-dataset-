@@ -34,8 +34,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import scale
-from sklearn.preprocessing import StandardScaler
+#from sklearn.preprocessing import scale
+#from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from tabular_data import load_airbnb
 
@@ -653,8 +653,8 @@ def split_data(df):
 
     X = df.iloc[:, 1:]
     y = df.iloc[:, 0]
-    X = scale(X)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+#    X = scale(X)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.8)
     X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
     return X, y, X_train, y_train, X_test, y_test, X_validation, y_validation
 # end split_data

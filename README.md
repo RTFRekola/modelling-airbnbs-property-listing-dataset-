@@ -97,12 +97,12 @@ Read the numerical values data in as the data for machine learning models. Used 
 
 Best models and the hyperparameters used to get them (values rounded to 4 decimal places):
 
-| Model | Validation score | R^2 score | RMSE | Hyperparameters |
-| ----- | ---------------- | --------- | ---- | ----------------| 
-| SGD Regressor | -0.1693 | 0.7364 | 0.5188 | "alpha": 0.1, "eta0": 0.01, "learning_rate": "constant", "max_iter": 400, "power_t": 0.1 |
-| Decision Tree Regressor | -0.3211 | 0.8666 | 0.3659 | "criterion": "squared_error", "max_depth": 5, "min_samples_leaf": 2, "min_samples_split": 4 |
-| Random Forest Regressor | -0.2195 | 0.9693 | 0.1737 | "learning_rate": 0.1, "loss": "squared_error", "min_samples_leaf": 1, "n_estimators": 50 |
-| Gradient Boosting Regressor | -0.2087 | 0.9154 | 0.2879 | "bootstrap": true, "criterion": "squared_error", "min_samples_leaf": 1, "n_estimators": 400 |
+| Estimator | Training RMSE | Validation RMSE | Validation R^2 | Hyperparameters |
+| --------- | ------------- | --------------- | -------------- | ----------------| 
+| SGD Regressor | -0.1693 | 0.5188 | 0.7364 | "alpha": 0.1, "eta0": 0.01, "learning_rate": "constant", "max_iter": 400, "power_t": 0.1 |
+| Decision Tree Regressor | -0.3211 | 0.3659 | 0.8666 | "criterion": "squared_error", "max_depth": 5, "min_samples_leaf": 2, "min_samples_split": 4 |
+| Random Forest Regressor | -0.2195 | 0.1737 | 0.9693 | "learning_rate": 0.1, "loss": "squared_error", "min_samples_leaf": 1, "n_estimators": 50 |
+| Gradient Boosting Regressor | -0.2087 | 0.2879 | 0.9154 | "bootstrap": true, "criterion": "squared_error", "min_samples_leaf": 1, "n_estimators": 400 |
 
 ### Classification Model Creation
 
@@ -110,7 +110,7 @@ Imported Airbnb data with column "Category" as the label. Trained sklearn Logist
 
 Best models and the hyperparameters used to get them (values rounded to 4 decimal places):
 
-| Model | Validation score | F1 score | Accuracy | Hyperparameters |
+| Estimator | Validation score | F1 score | Accuracy | Hyperparameters |
 | ----- | ---------------- | -------- | -------- | ----------------| 
 | Logistic Regression | 0.7626 | 0.8394 | 0.8370 | "C": 1, "max_iter": 10, "solver": "newton-cg" |
 | Decision Tree Classifier | 0.7486 | 0.9677 | 0.9658 | "criterion": "gini", "max_depth": 20, "min_samples_leaf": 1, "min_samples_split": 4 |
@@ -174,6 +174,6 @@ Best optimisers and the hyperparameters used to get the best results in each of 
 | ----- | --------- | ---- | --------- | ----------------| 
 | Price_Night | Adagrad | 2.2660 | 0.07496 | "hidden_layer_width": 12, "model_depth": 2, "learning_rate": 0.0001 |
 | bedrooms | Adagrad | 0.8412 | 0.2181 | "hidden_layer_width": 8, "model_depth": 3, "learning_rate": 0.0004 |
-| Category | Adagrad | 1.5691 | .0.3705 | "hidden_layer_width": 16, "model_depth": 2, "learning_rate": 0.0004 |
+| Category | Adagrad | 1.5691 | -0.3705 | "hidden_layer_width": 16, "model_depth": 2, "learning_rate": 0.0004 |
 
 As can be seen in the comparison with results of machine learning models further above, they yielded generally better results than the neural network. This is likely to indicate that usage of more optimisers and/or hyperparameters and their values might have produced better results, possibly better than the machine learning models. 

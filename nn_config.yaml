@@ -1,0 +1,5 @@
+---
+optimiser: ["SGD", "Adagrad", "Adam"]
+learning_rate: [0.001, 0.002, 0.004]
+hidden_layer_width: [24, 48, 96]
+model_depth: [8, 16, 32]

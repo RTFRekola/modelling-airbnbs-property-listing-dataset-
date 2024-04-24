@@ -22,7 +22,7 @@ import yaml
 from datetime import datetime
 from modelling import save_model, split_data
 from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.preprocessing import scale
+# from sklearn.preprocessing import StandardScaler
 from tabular_data import load_airbnb
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.tensorboard import SummaryWriter
@@ -166,6 +166,7 @@ def train(model, loader, epochs, optimiser_value, learning_rate_value):
     r2_score = sum(r2_score_items) / len(r2_score_items)
     rmse_loss_average = sum(rmse_loss_items) / len(rmse_loss_items)
     inference_latency = sum(inference_latency_items) / len(inference_latency_items)
+#    print('rmse_max = ', max(rmse_loss_items))
     return rmse_loss_average, r2_score, inference_latency
 # end train
 
@@ -215,7 +216,7 @@ def find_best_nn(config, train_loader):
     - training_duration = time taken to train the model
     '''
 
-    epochs = 10
+    epochs = 100
     loss_function_baseline = 999.9
     optimiser_list = config['optimiser']
     hidden_layer_width_list = config['hidden_layer_width']
@@ -284,27 +285,32 @@ Parameters:
 '''
 
 # Load the input data.
-#features_labels_tuple = load_airbnb("Price_Night")
-features_labels_tuple = load_airbnb("bedrooms")
+features_labels_tuple = load_airbnb("Price_Night")
+#features_labels_tuple = load_airbnb("bedrooms")
 #features_labels_tuple = load_airbnb("Category")
 # Using sklearn to train a linear regression model to predict a feature from 
 # the tabular data. Keep one of the lines above uncommented and comment the 
 # other two. 
 df = features_labels_tuple[0]
 X, y, X_train, y_train, X_test, y_test, X_validation, y_validation = split_data(df)
-print(df.dtypes)
+#print(df.dtypes)
 if __name__ == '__main__':
     # Load hyperparameters from file.
     config = get_nn_config()
     # Prepare the neural network dataset.
     dataset = AirbnbNightlyPriceRegressionDataset()
-    train_len = int(len(dataset)*0.8)      
+    train_len = int(len(dataset)*0.8)
     train_set, test_set = torch.utils.data.random_split(dataset, [train_len, len(dataset)-train_len])
     # Prepare the neural network dataloaders.
     train_loader = DataLoader(train_set, shuffle=True, batch_size=128)
     test_loader = DataLoader(test_set, shuffle=False, batch_size=128)
-    train_len = int(len(train_set)*0.75)      
+    train_len = int(len(train_set)*0.5)      
     train_set, validation_set = torch.utils.data.random_split(train_set, [train_len, len(train_set)-train_len])
+#    scaler = StandardScaler()
+    X_train_scaled = X_train  # This is a temporary notation
+#    X_train_scaled = scaler.fit_transform(X_train)
+    X_validation_scaled = X_validation  # This is a temporary notation
+#    X_validation_scaled = scaler.transform(X_validation)
     # Prepare the features and labels for the neural network model.
     example = next(iter(train_loader))
     features, labels = example
@@ -318,7 +324,7 @@ if __name__ == '__main__':
         epochs = 10
         model = Neural_Network(config, 1, 1)
         grid = GridSearchCV(estimator=model, param_grid=config)
-        grid_result = grid.fit(X_train, y_train)
+        grid_result = grid.fit(X_train_scaled, y_train)
         print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
         means = grid_result.cv_results_['mean_test_score']
         stds = grid_result.cv_results_['std_test_score']
