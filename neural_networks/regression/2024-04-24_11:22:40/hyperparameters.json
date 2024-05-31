@@ -1,0 +1,1 @@
+{"optimiser": "Adagrad", "hidden_layer_width": 12, "model_depth": 3, "learning_rate": 2e-05}

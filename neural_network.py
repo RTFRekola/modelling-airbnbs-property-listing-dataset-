@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Thu 8 Feb 2024 at 15:29 UT 
+Last modified on Thu 16 May 2024 at 13:13 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -286,8 +286,8 @@ Parameters:
 
 # Load the input data.
 features_labels_tuple = load_airbnb("Price_Night")
-#features_labels_tuple = load_airbnb("bedrooms")
 #features_labels_tuple = load_airbnb("Category")
+#features_labels_tuple = load_airbnb("bedrooms")
 # Using sklearn to train a linear regression model to predict a feature from 
 # the tabular data. Keep one of the lines above uncommented and comment the 
 # other two. 

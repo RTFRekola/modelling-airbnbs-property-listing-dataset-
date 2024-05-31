@@ -1,0 +1,1 @@
+{"optimiser": "SGD", "hidden_layer_width": 16, "model_depth": 2, "learning_rate": 4e-05}

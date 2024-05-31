@@ -132,48 +132,46 @@ Modified the code to read operational test parameters from a YAML file (see the 
 These parameters include a set of optimisers, learning rates, hidden layer widths and model depths.
 Added functionality to save each of the tests in a separate folder of its own. The save data includes the RMSE loss, R^2 score, model training time, and average prediction making time. 
 
-Ran through tests with a range of parameters and saved each in its own folder and the best separately in a specific folder reserved for the best model. The input parameters tested the neural networks with three different depths (2, 3 and 4) and three different widths (8, 12 and 16). For simplicity each of the hidden layers had the same width. Each of these variations was fed into three optimisers (SGD, Adagrad and Adam). Additionally three values of learning rate were tested (0.0001, 0.0002 and 0.0004). All the test values combined produced altogether 81 different variations. The neural network architecture schematics of the tested variations are shown graphically below. 
+Ran through tests with a range of parameters and saved each in its own folder and the best separately in a specific folder reserved for the best model. The input parameters tested the neural networks with three different depths (1, 3 and 6) and three different widths (4, 12 and 24). For simplicity each of the hidden layers had the same width. Each of these variations was fed into three optimisers (SGD, Adagrad and Adam). Additionally three values of learning rate were tested (0.0001, 0.001 and 0.01). All the test values combined produced altogether 81 different variations. The neural network architecture schematics of the tested variations are shown graphically below. 
 
-![modelling-airbnbs-property-listing-dataset-](img/NNarchitecture.png?raw=true "Neural network architecture for all tested variations with two, three or four hidden layers, each with a width of either 8, 12 or 16.")
+![modelling-airbnbs-property-listing-dataset-](img/NNarchitecture.png?raw=true "Neural network architecture for all tested variations with one, three or six hidden layers, each with a width of either 4, 12 or 24.")
 
 #### First model - price per night as the label
 
-The test setting described above was first run with Price_Night as the label. Loss function behaviour in each of the tests was monitored with TensorBoard in VSC. The combined graphs of the best 15 variations are shown below. TensorBoard smoothing was set to value 0.80.
+The test setting described above was first run with Price_Night as the label. Loss function behaviour in each of the tests was monitored with TensorBoard in VSC. The combined graphs of ten representative variations are shown below. TensorBoard smoothing was set to value 0.95.
 
 ![modelling-airbnbs-property-listing-dataset-](img/TB-Price_Night.png?raw=true "Loss functions of the best 15 tests.")
 
-The best prediction was produced with Adagrad, using two hidden layers, each with a width of 12, and learning rate of 0.0001. See the image below for the neural network architecture, which produced the best results. 
+The best prediction was produced with Adagrad, using three hidden layers, each with a width of 24, and learning rate of 0.01. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/Price_Night-2x12.png?raw=true "Best neural network for 'Price_Night'.")
-
-It is worth noting that the best model parameters are not identifying a trend of best values - at least if compared to the set of 12 chosen best descending loss functions. While optimiser Adam was only present in 2 of the best 12 tests, the rest were roughly equally divided between SGD and Adagrad. The model depth was most commonly four, with only two depths of two in the set of 12. The hidden layer width and learning rate were both equally distributed between the three options of each.
+![modelling-airbnbs-property-listing-dataset-](img/Price_Night-3x24.png?raw=true "Best neural network for 'Price_Night'.")
 
 #### Second model - number of bedrooms as the label
 
-The same code as above was run again, but this time the label was changed from the price per night to the number of bedrooms. Again, each optimiser had good and not so good results for various parameters. Adagrad had fewer good ones, but that may be statistically insignificant - especially since the best test run was made with Adagrad. Unlike with the price per night results, there was a clear trend with the number of bedroom results favouring higher number of hidden layer widths and smaller number of hidden layers. Also higher learning rate values seemed to produce better results. The best 15 results are shown again as a TensorBoard graph below. 
+The same code as above was run again, but this time the label was changed from the price per night to the number of bedrooms. A group of ten representative results are shown again as a TensorBoard graph below. 
 
 ![modelling-airbnbs-property-listing-dataset-](img/TB-bedrooms.png?raw=true "Loss functions of the best 15 tests.")
 
-The best prediction was produced with Adagrad, using three hidden layers, each with a width of eight, and learning rate of 0.0004. See the image below for the neural network architecture, which produced the best results. 
+The best prediction was produced with Adam, using three hidden layers, each with a width of 12, and learning rate of 0.01. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/bedrooms-3x8.png?raw=true "Best neural network for 'bedrooms'.")
+![modelling-airbnbs-property-listing-dataset-](img/bedrooms-3x12.png?raw=true "Best neural network for 'bedrooms'.")
 
 #### Third model - category as the label
 
-The same code as above was run one more time. This time the label was set to the category. Again, each optimiser had good and not so good results for various parameters. Adagrad had fewer good ones, but that may be statistically insignificant - especially since the best test run was made with Adagrad. Unlike with the price per night results, there was a clear trend with the number of bedroom results favouring higher number of hidden layer widths and smaller number of hidden layers. Also higher learning rate values seemed to produce better results. The best 15 results are shown again as a TensorBoard graph below. 
+The same code as above was run one more time. This time the label was set to the category. A group of ten representative results results are shown again as a TensorBoard graph below. 
 
 ![modelling-airbnbs-property-listing-dataset-](img/TB-Category.png?raw=true "Loss functions of the best 15 tests.")
 
-The best prediction was produced with Adam, using two hidden layers, each with a width of 16, and learning rate of 0.0004. See the image below for the neural network architecture, which produced the best results. 
+The best prediction was produced with Adam, using 1 hidden layer, with a width of 4, and learning rate of 0.01. See the image below for the neural network architecture, which produced the best results. 
 
-![modelling-airbnbs-property-listing-dataset-](img/Category-2x16.png?raw=true "Best neural network for 'Category'.")
+![modelling-airbnbs-property-listing-dataset-](img/Category-1x4.png?raw=true "Best neural network for 'Category'.")
 
-Best optimisers and the hyperparameters used to get the best results in each of the three cases above (values rounded to 4 significant decimal places):
+Best optimisers and the hyperparameters used to get the best results in each of the three aforementioned cases (values rounded to 4 significant decimal places):
 
 | Label | Optimiser | RMSE | R^2 score | Hyperparameters |
 | ----- | --------- | ---- | --------- | ----------------| 
-| Price_Night | Adagrad | 2.2660 | 0.07496 | "hidden_layer_width": 12, "model_depth": 2, "learning_rate": 0.0001 |
-| bedrooms | Adagrad | 0.8412 | 0.2181 | "hidden_layer_width": 8, "model_depth": 3, "learning_rate": 0.0004 |
-| Category | Adagrad | 1.5691 | -0.3705 | "hidden_layer_width": 16, "model_depth": 2, "learning_rate": 0.0004 |
+| Price_Night | Adam | 108.5084 | 0.2280 | "hidden_layer_width": 24, "model_depth": 3, "learning_rate": 0.01 |
+| bedrooms | Adam | 0.4745 | 0.7725 | "hidden_layer_width": 12, "model_depth": 3, "learning_rate": 0.01 |
+| Category | Adam | 1.313 | 0.0484 | "hidden_layer_width": 4, "model_depth": 1, "learning_rate": 0.01 |
 
-As can be seen in the comparison with results of machine learning models further above, they yielded generally better results than the neural network. This is likely to indicate that usage of more optimisers and/or hyperparameters and their values might have produced better results, possibly better than the machine learning models. 
+The low values of the R^2 score are a result of the high variation, but - as seen in the graphs above - the smoothed curves show that the overall evolution of the values finds a fairly constant level, which is at a reasonable value considering the input data. Although Adam came up as the best optimiser in each case, the individual results for each run show that for otherwise identical test parameters, Adagrad was often very close to the results obtained with Adam. In general SGD performed less well, but a small numbner of results were close to the best obtained with Adam and Adagrad. While a choise of six hidden layers may seem excessive, and certainly six layers were not present in any of the best results, they produces results nearly as good as those with three hidden layers. Results obtained with only one hidden layer were often comparable with those of more layers, but generally always a little worse. For the price per night results, the hidden layer width of 24 produced clearly the best results. Otherwise there was not significant difference between layer widths of 4, 12 and 24. Best results for each of the three tested labels were obtained with learning rate of 0.01, but results with learning rate of 0.001 were better for some combinations of parameters and in a small number of cases learning rate of 0.0001 was better than either 0.01 or 0.001, but never better than both of them. 
