@@ -103,8 +103,9 @@ Best models and the hyperparameters used to get them (values rounded to 4 decima
 | Decision Tree Regressor     | 1.2056                 | 1.4176                  | 1.40852                | -4.0183      | -6.5151        | -9.2523  | 
 | Random Forest Regressor     | 0.4774                 | 1.3892                  | 1.3669                 | 0.75129      | -4.0843        | -4.0121  | 
 | Gradient Boosting Regressor | 0.9816                 | 1.3784                  | 1.3510                 | -2.0177      | -7.3480        | -9.4427  | 
-| Estimator                   | Hyperparameters |
-| ---------                   | --------------- |
+
+| Estimator                   | Hyperparameters for the best model results given above |
+| ---------                   | ------------------------------------------------------ |
 | SGD Regressor               | "alpha": 0.001, "eta0": 0.01, "learning_rate": "constant", "max_iter": 400, "power_t": 0.9 |
 | Decision Tree Regressor     | "criterion": "poisson", "max_depth": 2, "min_samples_leaf": 1, "min_samples_split": 2 |
 | Random Forest Regressor     | "bootstrap": true, "criterion": "friedman_mse", "min_samples_leaf": 1, "n_estimators": 50 |
