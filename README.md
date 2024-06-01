@@ -18,11 +18,29 @@ This is a project in which a typical selection of Airbnb accommodation data was 
 When preparing to run this code for the first time, do the following:
 - create a directory for the code; e.g. in Linux terminal <b>mkdir airbnb</b>
 - copy files <b><i>neural_network.py</i></b>, <b><i>modelling.py</i></b>, <b><i>tabular_data.py</i></b>, <b><i>nn_config.yalm</i></b>, and <b><i>copyright.txt</i></b> into the dictionary you just created
-- go to this directory and create the following directories (see also "file structure" below) in it; e.g. in Linux terminal <b>mkdir models models/classification models/classification/decision_tree models/classification/gradient_boosting models/classification/logistic_regression models/classification/random/forest models/regression models/regression/decision_tree models/regression/gradient_boosting models/regression/linear_regression models/regression/random_forest neural_networks neural_networks/best_nn neural_networks/regression</b>
+- go to this directory and create the following directories (see also "file structure" below) in it; e.g. in Linux terminal 
+
+```
+mkdir models models/classification models/classification/decision_tree models/classification/gradient_boosting models/classification/logistic_regression models/classification/random/forest models/regression models/regression/decision_tree models/regression/gradient_boosting models/regression/linear_regression models/regression/random_forest neural_networks neural_networks/best_nn neural_networks/regression
+```
+
+- update your Python environment to match the dependencies given in the file <b><i>requirements.txt</i></b>
 
 ## Usage Instructions
 
-Open a terminal and go to the directory where you installed the code. If you want to test a series of regression and classification machine learning models, run <b>python3 modelling.py</b> and check the contents of the directory <b><i>models</i></b> for results. If you want to test neural networks, run <b>python3 neural_network.py</b> and check the contents of the directory <b><i>neural_networks</i></b> for results. Once run, the folders in <b><i>models/classification</i></b> and <b><i>models/regression</i></b> will have files in them. Similarly the there will be folders named with the day and time of the run in <b><i>neural_networks/regression</i></b>, which contain files with results of the run. The files in these folders contain the best model, the hyperparameters used in this case, and the loss or score of the run with these hyperparameters. 
+Open a terminal and go to the directory where you installed the code. If you want to test a series of regression and classification machine learning models, run 
+
+```
+python3 modelling.py
+```
+
+and check the contents of the directory <b><i>models</i></b> for results. If you want to test neural networks, run 
+
+```
+python3 neural_network.py
+```
+
+and check the contents of the directory <b><i>neural_networks</i></b> for results. Once run, the folders in <b><i>models/classification</i></b> and <b><i>models/regression</i></b> will have files in them. Similarly the there will be folders named with the day and time of the run in <b><i>neural_networks/regression</i></b>, which contain files with results of the run. The files in these folders contain the best model, the hyperparameters used in this case, and the loss or score of the run with these hyperparameters. 
 
 ## File Structure
 
@@ -34,6 +52,7 @@ You may choose to have a specific location and name for your project directory. 
 &nbsp;&nbsp;&nbsp; |_ tabular_data.py<br />
 &nbsp;&nbsp;&nbsp; |_ modelling.py<br />
 &nbsp;&nbsp;&nbsp; |_ neural_networks.py<br />
+&nbsp;&nbsp;&nbsp; |_ requirements.txt<br />
 &nbsp;&nbsp;&nbsp; |_ copyright.txt<br />
 &nbsp;&nbsp;&nbsp; |_ <b><i>models</i></b><br />
 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; |_ <b><i>classification</i></b><br />
