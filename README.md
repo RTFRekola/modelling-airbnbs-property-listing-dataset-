@@ -1,14 +1,6 @@
 # Modelling Airbnb's Property Listing Dataset
 Build a framework to systematically train, tune, and evaluate models on several tasks that are tackled by the Airbnb team. 
 
-## Table of Contents
-1. [Project Description](#project-description)
-2. [Installation Instructions](#installation-instructions)
-3. [Usage Instructions](#usage-instructions)
-4. [File Structure](#file-structure)
-5. [License Information](#license-information)
-6. [Project History](#project-history)
-
 ## Project Description
 
 This is a project in which a typical selection of Airbnb accommodation data was used for creating a set of machine learning models and neural networks in order to make predictions based on the data. The project consisted of writing Python 3 code to perform the aforementioned tasks and displaying graphical and numeric data on the results. 
