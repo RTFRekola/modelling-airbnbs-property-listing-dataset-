@@ -97,12 +97,18 @@ Read the numerical values data in as the data for machine learning models. Used 
 
 Best models and the hyperparameters used to get them (values rounded to 4 decimal places):
 
-| Estimator                   | Training RMSE           | Validation RMSE          | Test RMSE               | Training R^2 | Validation R^2 | Test R^2 | Hyperparameters |
-| ---------                   | -------------           | ---------------          | ---------               | ------------ | -------------- | -------- | ----------------| 
-| SGD Regressor               | 0.1476×10<sup>-15</sup> | 0.1497×10<sup>-15</sup>  | 0.1432×10<sup>-15</sup> | -1.2743      | -1.2587        | -1.3848  | "alpha": 0.001, "eta0": 0.01, "learning_rate": "constant", "max_iter": 400, "power_t": 0.9 |
-| Decision Tree Regressor     | 1.2056                  | 1.4176                   | 1.40852                 | -4.0183      | -6.5151        | -9.2523  | "criterion": "poisson", "max_depth": 2, "min_samples_leaf": 1, "min_samples_split": 2 |
-| Random Forest Regressor     | 0.4774                  | 1.3892                   | 1.3669                  | 0.75129      | -4.0843        | -4.0121  | "bootstrap": true, "criterion": "friedman_mse", "min_samples_leaf": 1, "n_estimators": 50 |
-| Gradient Boosting Regressor | 0.9816                  | 1.3784                   | 1.3510                  | -2.0177      | -7.3480        | -9.4427  | "learning_rate": 0.2, "loss": "huber", "min_samples_leaf": 4, "n_estimators": 10 |
+| Estimator                   | Training RMSE          | Validation RMSE         | Test RMSE              | Training R^2 | Validation R^2 | Test R^2 | 
+| ---------                   | -------------          | ---------------         | ---------              | ------------ | -------------- | -------- | 
+| SGD Regressor               | 0.1476×10<sup>15</sup> | 0.1497×10<sup>15</sup>  | 0.1432×10<sup>15</sup> | -1.2743      | -1.2587        | -1.3848  | 
+| Decision Tree Regressor     | 1.2056                 | 1.4176                  | 1.40852                | -4.0183      | -6.5151        | -9.2523  | 
+| Random Forest Regressor     | 0.4774                 | 1.3892                  | 1.3669                 | 0.75129      | -4.0843        | -4.0121  | 
+| Gradient Boosting Regressor | 0.9816                 | 1.3784                  | 1.3510                 | -2.0177      | -7.3480        | -9.4427  | 
+| Estimator                   | Hyperparameters |
+| ---------                   | --------------- |
+| SGD Regressor               | "alpha": 0.001, "eta0": 0.01, "learning_rate": "constant", "max_iter": 400, "power_t": 0.9 |
+| Decision Tree Regressor     | "criterion": "poisson", "max_depth": 2, "min_samples_leaf": 1, "min_samples_split": 2 |
+| Random Forest Regressor     | "bootstrap": true, "criterion": "friedman_mse", "min_samples_leaf": 1, "n_estimators": 50 |
+| Gradient Boosting Regressor | "learning_rate": 0.2, "loss": "huber", "min_samples_leaf": 4, "n_estimators": 10 |
 
 Negative R squared values indicate a non-linear x on y dependance or possibly some other problem, which is likely to be tied together with the fact that the number of data points used in this study was very limited to begin with. Whether overfitting could truly explain the high values RMSE of SGD Regressor is a matter of further study and might still not be resolved, given the small amount of data. 
 
