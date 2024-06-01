@@ -111,7 +111,7 @@ Best models and the hyperparameters used to get them (values rounded to 4 decima
 | Random Forest Regressor     | "bootstrap": true, "criterion": "friedman_mse", "min_samples_leaf": 1, "n_estimators": 50 |
 | Gradient Boosting Regressor | "learning_rate": 0.2, "loss": "huber", "min_samples_leaf": 4, "n_estimators": 10 |
 
-Negative R squared values indicate a non-linear x on y dependance or possibly some other problem, which is likely to be tied together with the fact that the number of data points used in this study was very limited to begin with. Whether overfitting could truly explain the high values RMSE of SGD Regressor is a matter of further study and might still not be resolved, given the small amount of data. 
+Negative R squared values indicate a non-linear x on y dependance or possibly some other problem, which is likely to be tied together with the fact that the number of data points used in this study was very limited to begin with. Whether overfitting could truly explain the high RMSE values of SGD Regressor is a matter of further study and might still not be resolved, given the small amount of data. 
 
 ### Classification Model Creation
 
