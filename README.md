@@ -8,7 +8,20 @@ This is a project in which a typical selection of Airbnb accommodation data was 
 ## Installation Instructions
 
 When preparing to run this code for the first time, do the following:
-- create a directory for the code; e.g. in Linux terminal <b>mkdir airbnb</b>
+
+- create a directory for the code; e.g. in Linux terminal give command 
+
+```
+mkdir airbnb
+```
+
+Now you can either (git clone the repository): 
+```
+git clone https://github.com/RTFRekola/modelling-airbnbs-property-listing-dataset-.git
+```
+If unfamiliar, see more information on [git cloning](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). 
+
+Or (perform the same manually):
 - copy files <b><i>neural_network.py</i></b>, <b><i>modelling.py</i></b>, <b><i>tabular_data.py</i></b>, <b><i>nn_config.yalm</i></b>, and <b><i>copyright.txt</i></b> into the dictionary you just created
 - go to this directory and create the following directories (see also "file structure" below) in it; e.g. in Linux terminal 
 
@@ -16,7 +29,7 @@ When preparing to run this code for the first time, do the following:
 mkdir models models/classification models/classification/decision_tree models/classification/gradient_boosting models/classification/logistic_regression models/classification/random/forest models/regression models/regression/decision_tree models/regression/gradient_boosting models/regression/linear_regression models/regression/random_forest neural_networks neural_networks/best_nn neural_networks/regression
 ```
 
-- update your Python environment to match the dependencies given in the file <b><i>requirements.txt</i></b>
+Finally you should update your Python environment to match the dependencies given in the file <b><i>requirements.txt</i></b>
 
 ## Usage Instructions
 
@@ -69,4 +82,4 @@ Copying and distribution of these files, with or without modification, are permi
 
 ## Project History
 
-See the [Project History in Wiki](https://github.com/RTFRekola/modelling-airbnbs-property-listing-dataset-/wiki).
+See the [Projec<t History in Wiki](https://github.com/RTFRekola/modelling-airbnbs-property-listing-dataset-/wiki). This includes outcomes of the models and their metrics, with some awesome graphics, too. 

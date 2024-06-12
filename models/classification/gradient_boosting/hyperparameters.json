@@ -1,1 +1,1 @@
-{"criterion": "squared_error", "learning_rate": 0.1, "min_samples_leaf": 1, "n_estimators": 50}
+{"criterion": "friedman_mse", "learning_rate": 0.01, "min_samples_leaf": 4, "n_estimators": 200}

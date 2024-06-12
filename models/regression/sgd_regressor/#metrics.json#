@@ -1,0 +1,8 @@
+SGD rgr
+{"validation_score": -1.577101315892499e+25, 
+"R^2_score_train": -9.28928066917792, 
+"RMSE_train": 8835 823 681 913.365, 
+"R^2_score_test": -8.616143690849587, 
+"RMSE_test": 8179 482 587 445.081, 
+"R^2_score_validation": -6.936068938116534, 
+"RMSE_validation": 8247 807 789 349.895}

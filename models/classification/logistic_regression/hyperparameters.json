@@ -1,1 +1,1 @@
-{"C": 1, "max_iter": 10, "solver": "newton-cg"}
+{"C": 0.5, "max_iter": 10, "solver": "newton-cholesky"}

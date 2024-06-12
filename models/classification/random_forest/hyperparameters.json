@@ -1,1 +1,1 @@
-{"bootstrap": true, "criterion": "gini", "min_samples_leaf": 4, "n_estimators": 200}
+{"bootstrap": true, "criterion": "log_loss", "min_samples_leaf": 1, "n_estimators": 100}

@@ -1,1 +1,1 @@
-{"bootstrap": true, "criterion": "squared_error", "min_samples_leaf": 1, "n_estimators": 400}
+{"bootstrap": true, "criterion": "poisson", "min_samples_leaf": 4, "n_estimators": 400}

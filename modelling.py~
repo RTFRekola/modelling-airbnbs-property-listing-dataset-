@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Mon 10 Jun 2024 at 14:07 UT 
+Last modified on Sun 4 Feb 2024 at 16:54 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -34,6 +34,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
+#from sklearn.preprocessing import scale
+#from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from tabular_data import load_airbnb
 
@@ -141,24 +143,32 @@ def tune_regression_model_hyperparameters(model, hyperparameters):
     best_score = clf.best_score_
     best_params = clf.best_params_
     metrics_dict = {"validation_score": best_score}
+    # version 3
     y_pred = clf.predict(X_train)
     r2 = r2_score(y_pred, y_train)
-    metrics_dict["R^2_score_train"] = float(r2)
+    metrics_dict["R^2_score"] = float(r2)
     mse = mean_squared_error(y_pred, y_train)
     rmse = math.sqrt(mse)
-    metrics_dict["RMSE_train"] = float(rmse)
-    y_pred_test = clf.predict(X_test)
-    r2_test = r2_score(y_pred_test, y_test)
-    metrics_dict["R^2_score_test"] = float(r2_test)
-    mse_test = mean_squared_error(y_pred_test, y_test)
-    rmse_test = math.sqrt(mse_test)
-    metrics_dict["RMSE_test"] = float(rmse_test)
-    y_pred_validation = clf.predict(X_validation)
-    r2_validation = r2_score(y_pred_validation, y_validation)
-    metrics_dict["R^2_score_validation"] = float(r2_validation)
-    mse_validation = mean_squared_error(y_pred_validation, y_validation)
-    rmse_validation = math.sqrt(mse_validation)
-    metrics_dict["RMSE_validation"] = float(rmse_validation)
+    metrics_dict["RMSE"] = float(rmse)
+    print("model, best_score, r2, rmse = ", model, best_score, r2, rmse)
+
+    ''' # version 2
+    clf_r2 = GridSearchCV(model, hyperparameters, scoring='r2')
+    clf_r2.fit(X_train, y_train)
+    best_score = clf_r2.best_score_
+    metrics_dict["R^2_score"] = float(best_score)
+    clf_mse = GridSearchCV(model, hyperparameters, scoring='mean_squared_error')
+    clf_mse.fit(X_train, y_train)
+    best_score = clf_mse.best_score_
+    metrics_dict["RMSE"] = float(best_score)
+    '''
+    ''' # version 1
+    r2 = r2_score(X_train, y_train)
+    metrics_dict["R^2_score"] = float(r2)
+    mse = mean_squared_error(X_train, y_train)
+    rmse = math.sqrt(mse)
+    metrics_dict["RMSE"] = float(rmse)
+    '''
     return best_estimator, best_params, metrics_dict
 # end tune_regression_model_hyperparameters
 
@@ -234,8 +244,19 @@ def evaluate_sgdregressor(X, y, X_train, y_train, X_test, y_test):
     y_hat_test = sgdr.predict(X_test)
     # Compute the key measures of performance for the regression model
     cv_score = cross_val_score(sgdr, X, y, cv = 10)
+    #print("CV mean score: ", cv_score.mean())
+    #print()
+    #print("MSE (train):", mean_squared_error(y_train, y_hat_train))
+    #print("MSE (test):", mean_squared_error(y_test, y_hat_test))
+    #print()
+    #print("RMSE (train):", mean_squared_error(y_train, y_hat_train, squared=False))
+    #print("RMSE (test):", mean_squared_error(y_test, y_hat_test, squared=False))
+    #print()
     score_train = sgdr.score(X_train, y_train)
+    #print("R-squared (train):", score_train)
     score_test = sgdr.score(X_test, y_test)
+    #print("R-squared (test):", score_test)
+    #print()
 # end evaluate_sgdregressor
 
 
@@ -267,6 +288,9 @@ def evaluate_all_models(task_folder):
     '''
 
     def print_and_save(best_estimator, best_params, best_score, task_folder, sub_folder):
+        #print("Best estimator = ", best_estimator)
+        #print("Best hyperparameter values = ", best_params)
+        #print("Best score = ", best_score)
         folder = os.path.join("models", task_folder, sub_folder)
         save_model(folder, best_estimator, best_params, best_score)
     # end print_and_save
@@ -415,8 +439,15 @@ def find_best_sgdregressor(X_train, X_test, X_validation):
         "power_t": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     }
     best_model, best_hyperparameter_values, performance_metrics = custom_tune_regression_model_hyperparameters(SGDRegressor, training_set, validation_set, test_set, hyperparameters)
+    #print("Best model = ", best_model)
+    #print("Best hyperparameter values = ", best_hyperparameter_values)
+    #print("Performance metrics = ", performance_metrics)
+    # Feed the model and parameters to a function to perform SK-learn GridSearchCV
     model = SGDRegressor()
     best_estimator, best_score, best_params = tune_regression_model_hyperparameters(model, hyperparameters)
+    #print("Best estimator: " + str(best_estimator))
+    #print("Best score: " + str(best_score))
+    #print("Best parameters: " + str(best_params))
     folder = os.path.join("models", "regression", "linear_regression")
     save_model(folder, best_estimator, best_hyperparameter_values, performance_metrics)
 # end find_best_sgdregressor
@@ -464,6 +495,8 @@ def find_best_model(task_folder):
     chosen_model = score_file[0]
     for one_of_files in score_file:
         with open(one_of_files, 'r') as contents:
+            #metrics_value_test = float(json.loads(contents.read()).get('validation_accuracy'))
+            #metrics_value_test = float(json.loads(contents.read()).get('validation_score'))
             if (task_folder == "regression"):
                 metrics_value_test = float(json.loads(contents.read()).get('RMSE'))
             elif (task_folder == "classification"):
@@ -505,20 +538,17 @@ def train_and_evaluate_logistic_regression():
     model.fit(X_train, y_train)
     y_hat_train = model.predict(X_train)
     y_hat_test = model.predict(X_test)
-    y_hat_validation = model.predict(X_validation)
+
     # Compute the F1 score, precision score, recall score and accuracy score
-    print("F1 score for train set:  ", f1_score(y_train, y_hat_train, average="macro"))
-    print("F1 score for test set:   ", f1_score(y_test, y_hat_test, average="macro"))
-    print("F1 score for validation set: ", f1_score(y_validation, y_hat_validation, average="macro"))
-    print("Precision for train set: ", precision_score(y_train, y_hat_train, average="macro"))
-    print("Precision for test set:  ", precision_score(y_test, y_hat_test, average="macro"))
-    print("Precision for validation set: ", precision_score(y_validation, y_hat_validation, average="macro"))
-    print("Recall for train set:    ", recall_score(y_train, y_hat_train, average="macro"))
-    print("Recall for test set:     ", recall_score(y_test, y_hat_test, average="macro"))
-    print("Recall for validation set: ", recall_score(y_validation, y_hat_validation, average="macro"))
-    print("Accuracy for train set:  ", accuracy_score(y_train, y_hat_train))
-    print("Accuracy for test set:   ", accuracy_score(y_test, y_hat_test))
-    print("Accuracy for validation set: ", accuracy_score(y_validation, y_hat_validation))
+    #print("F1 score for train set:  ", f1_score(y_train, y_hat_train, average="macro"))
+    #print("F1 score for test set:   ", f1_score(y_test, y_hat_test, average="macro"))
+    #print("Precision for train set: ", precision_score(y_train, y_hat_train, average="macro"))
+    #print("Precision for test set:  ", precision_score(y_test, y_hat_test, average="macro"))
+    #print("Recall for train set:    ", recall_score(y_train, y_hat_train, average="macro"))
+    #print("Recall for test set:     ", recall_score(y_test, y_hat_test, average="macro"))
+    #print("Accuracy for train set:  ", accuracy_score(y_train, y_hat_train))
+    #print("Accuracy for test set:   ", accuracy_score(y_test, y_hat_test))
+
     # Tune hyperparameters
     hyperparameters = {
         "solver": ["newton-cg", "newton-cholesky", "sag", "saga"],
@@ -526,9 +556,9 @@ def train_and_evaluate_logistic_regression():
         "C": [0.5, 1, 2]
     }
     best_model, best_params, metrics_dict = tune_classification_model_hyperparameters(model, hyperparameters)
-    print("Best model = ", best_model)
-    print("Best hyperparameter values = ", best_params)
-    print("Accuracy = ", metrics_dict)
+    #print("Best model = ", best_model)
+    #print("Best hyperparameter values = ", best_params)
+    #print("Accuracy = ", metrics_dict)
 # end train_and_evaluate_logistic_regression
 
 
@@ -552,39 +582,20 @@ def tune_classification_model_hyperparameters(model, hyperparameters):
     - best_score = the value of the best result from GridSearchCV
     '''
 
+    print("Arrived to tune_classification_model_hyperparameters")
+    #clf = GridSearchCV(model, hyperparameters, scoring='neg_mean_squared_error')
     clf = GridSearchCV(model, hyperparameters, scoring='accuracy')
     clf.fit(X_train, y_train)
     best_estimator = clf.best_estimator_
     best_score = clf.best_score_
     best_params = clf.best_params_
     metrics_dict = {"validation_score": best_score}
-    y_pred_train = clf.predict(X_train)
-    y_pred_test = clf.predict(X_test)
-    y_pred_validation = clf.predict(X_validation)
-    f1_train = f1_score(y_pred_train, y_train, average='weighted')
-    f1_test = f1_score(y_pred_test, y_test, average='weighted')
-    f1_validation = f1_score(y_pred_validation, y_validation, average='weighted')
-    metrics_dict["F1_score_train"] = float(f1_train)
-    metrics_dict["F1_score_test"] = float(f1_test)
-    metrics_dict["F1_score_validation"] = float(f1_validation)
-    accuracy_train = accuracy_score(y_train, y_pred_train)
-    accuracy_test = accuracy_score(y_test, y_pred_test)
-    accuracy_validation = accuracy_score(y_validation, y_pred_validation)
-    metrics_dict["accuracy_train"] = float(accuracy_train)
-    metrics_dict["accuracy_test"] = float(accuracy_test)
-    metrics_dict["accuracy_validation"] = float(accuracy_validation)
-    recall_train = recall_score(y_train, y_pred_train, average="macro")
-    recall_test = recall_score(y_test, y_pred_test, average="macro")
-    recall_validation = recall_score(y_validation, y_pred_validation, average="macro")
-    metrics_dict["recall_score_train"] = float(recall_train)
-    metrics_dict["recall_score_test"] = float(recall_test)
-    metrics_dict["recall_score_validation"] = float(recall_validation)
-    precision_train = precision_score(y_train, y_pred_train, average="macro")
-    precision_test = precision_score(y_test, y_pred_test, average="macro")
-    precision_validation = precision_score(y_validation, y_pred_validation, average="macro")
-    metrics_dict["precision_score_train"] = float(precision_train)
-    metrics_dict["precision_score_test"] = float(precision_test)
-    metrics_dict["precision_score_validation"] = float(precision_validation)
+    y_pred = clf.predict(X_train)
+    f1 = f1_score(y_pred, y_train, average='weighted')
+    metrics_dict["F1_score"] = float(f1)
+    accuracy = accuracy_score(y_train, y_pred)
+    metrics_dict["accuracy"] = float(accuracy)
+    print("model, best_score, f1, accuracy = ", model, best_score, f1_score, accuracy)
     return best_estimator, best_params, metrics_dict
 # end tune_classification_model_hyperparameters
 
@@ -616,6 +627,9 @@ def tune_classification_model_hyperparameters2(model, hyperparameters):
     best_model = clf.best_estimator_
     best_params = clf.best_params_
     metrics_dict = {"validation_score": clf.best_score_}
+    #metrics_dict = {"validation_accuracy": clf.best_score_}
+    #print('best_model = ', best_model)
+    #print('validation_accuracy = ', clf.best_score_)
     # Save the model performance values
     folder = os.path.join("models", "classification", "logistic_regression")
     save_model(folder, best_model, best_params, metrics_dict)
@@ -639,6 +653,7 @@ def split_data(df):
 
     X = df.iloc[:, 1:]
     y = df.iloc[:, 0]
+#    X = scale(X)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.8)
     X_test, X_validation, y_test, y_validation = train_test_split(X_test, y_test, test_size=0.5)
     return X, y, X_train, y_train, X_test, y_test, X_validation, y_validation
@@ -668,12 +683,15 @@ Parameters:
    = machine learning division of input data into training, testing and validation sets
 '''
 
+# Load the input data
+features_labels_tuple = load_airbnb("bedrooms")
+# Using sklearn to train a linear regression model to predict first 
+# the "Price_Night" and then the "Category" feature from the tabular data.
+df_in = features_labels_tuple[0]
+df = df_in.replace(['Treehouses', 'Category', 'Chalets', 'Amazing pools', 'Offbeat', 'Beachfront'],
+                   [1, 1, 2, 3, 4, 5])
+X, y, X_train, y_train, X_test, y_test, X_validation, y_validation = split_data(df)
 if __name__ == "__main__":
-    features_labels_tuple = load_airbnb("Price_Night")
-    #features_labels_tuple = load_airbnb("Category")
-    #features_labels_tuple = load_airbnb("bedrooms")
-    df = features_labels_tuple[0]
-    X, y, X_train, y_train, X_test, y_test, X_validation, y_validation = split_data(df)
     # Evaluate SGDregressor model
     evaluate_sgdregressor(X, y, X_train, y_train, X_test, y_test)
     find_best_sgdregressor(X_train, X_test, X_validation)
@@ -681,16 +699,16 @@ if __name__ == "__main__":
     evaluate_all_models("regression")
     # Find the best regression model from those processed earlier
     loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
     # Train and evaluate logistic regression
     train_and_evaluate_logistic_regression()
     # Evaluate a set of alternative classification models
     evaluate_all_models("classification")
     # Find the best classification model from those processed earlier
     loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
 # end if

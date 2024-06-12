@@ -1,0 +1,15 @@
+DecT
+{"validation_score": 0.7485656565656565, "F1_score": 0.9676875288874573, "accuracy": 0.96579476861167}
+{"criterion": "gini", "max_depth": 20, "min_samples_leaf": 1, "min_samples_split": 4}
+
+GraB
+{"validation_score": 0.7847676767676768, "F1_score": 0.9778870752592761, "accuracy": 0.9778672032193159}
+{"criterion": "squared_error", "learning_rate": 0.1, "min_samples_leaf": 1, "n_estimators": 50}
+
+RanF
+{"validation_score": 0.8028686868686868, "F1_score": 0.9079039260954344, "accuracy": 0.903420523138833}
+{"bootstrap": true, "criterion": "gini", "min_samples_leaf": 4, "n_estimators": 200}
+
+LogR
+{"validation_score": 0.7626060606060606, "F1_score": 0.839385916495094, "accuracy": 0.8370221327967807}
+{"C": 1, "max_iter": 10, "solver": "newton-cg"}
