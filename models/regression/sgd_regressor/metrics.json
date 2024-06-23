@@ -1,1 +1,1 @@
-{"validation_score": -1.577101315892499e+25, "R^2_score_train": -9.28928066917792, "RMSE_train": 8835823681913.365, "R^2_score_test": -8.616143690849587, "RMSE_test": 8179482587445.081, "R^2_score_validation": -6.936068938116534, "RMSE_validation": 8247807789349.895}
+{"validation_score": -9271.85200616671, "R^2_score_train": -0.6858706329699176, "RMSE_train": 88.60937435914727, "R^2_score_test": -1.4913129112752155, "RMSE_test": 112.72008407791094, "R^2_score_validation": -1.3877928963194894, "RMSE_validation": 108.28391053357034}

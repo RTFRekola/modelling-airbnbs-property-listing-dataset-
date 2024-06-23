@@ -1,0 +1,17 @@
+{"validation_score": 0.3757575757575758, 
+
+"F1_score_train": 0.458252035172055, 
+"F1_score_test": 0.3842987038131105, 
+"F1_score_validation": 0.3858247711674259, 
+
+"accuracy_train": 0.4303030303030303, 
+"accuracy_test": 0.3493975903614458, 
+"accuracy_validation": 0.3704819277108434, 
+
+"recall_score_train": 0.395431016771646, 
+"recall_score_test": 0.32549116846585197, 
+"recall_score_validation": 0.3543823754401359, 
+
+"precision_score_train": 0.44533767148771786, 
+"precision_score_test": 0.3299625820918464, 
+"precision_score_validation": 0.3851067755177344}

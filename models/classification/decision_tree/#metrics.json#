@@ -1,15 +1,18 @@
-DecT
-{"validation_score": 0.7485656565656565, "F1_score": 0.9676875288874573, "accuracy": 0.96579476861167}
-{"criterion": "gini", "max_depth": 20, "min_samples_leaf": 1, "min_samples_split": 4}
+{"validation_score": 0.4424242424242424, 
 
-GraB
-{"validation_score": 0.7847676767676768, "F1_score": 0.9778870752592761, "accuracy": 0.9778672032193159}
-{"criterion": "squared_error", "learning_rate": 0.1, "min_samples_leaf": 1, "n_estimators": 50}
+"F1_score_train": 0.495831502702091, 
+"F1_score_test": 0.37342466357037224, 
+"F1_score_validation": 0.3923351812130597, 
 
-RanF
-{"validation_score": 0.8028686868686868, "F1_score": 0.9079039260954344, "accuracy": 0.903420523138833}
-{"bootstrap": true, "criterion": "gini", "min_samples_leaf": 4, "n_estimators": 200}
+"accuracy_train": 0.4484848484848485, 
+"accuracy_test": 0.29819277108433734, 
+"accuracy_validation": 0.3072289156626506, 
 
-LogR
-{"validation_score": 0.7626060606060606, "F1_score": 0.839385916495094, "accuracy": 0.8370221327967807}
-{"C": 1, "max_iter": 10, "solver": "newton-cg"}
+"recall_score_train": 0.3825907107028858, 
+"recall_score_test": 0.27639140044203336, 
+"recall_score_validation": 0.2973837085034817, 
+
+"precision_score_train": 0.5235033259423504, 
+"precision_score_test": 0.24640159195513095, 
+"precision_score_validation": 0.2564513774858602
+

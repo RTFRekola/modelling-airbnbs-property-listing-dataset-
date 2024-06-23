@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Mon 10 Jun 2024 at 14:07 UT 
+Last modified on Sat 22 Jun 2024 at 12:01 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -271,103 +271,105 @@ def evaluate_all_models(task_folder):
         save_model(folder, best_estimator, best_params, best_score)
     # end print_and_save
     
-    model_name_list = [] ; model_list = [] ; hyperparameter_list = []
+    model_name_list_r = [] ; model_list_r = [] ; hyperparameter_list_r = []
+    model_name_list_c = [] ; model_list_c = [] ; hyperparameter_list_c = []
     if (task_folder == "regression"):
         # Decision Tree Regressor
-        model_name_list.append("decision_tree")
-        model_list.append(DecisionTreeRegressor())
+        model_name_list_r.append("decision_tree")
+        model_list_r.append(DecisionTreeRegressor())
         hyperparameters = {
-            "max_depth": [2, 5, 10, 20],
+            "max_depth": [2, 5, 10, 20, 50],
             "criterion": ["squared_error", "friedman_mse", "poisson"],
             "min_samples_leaf": [1, 2, 4],
             "min_samples_split": [2, 4, 8]
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_r.append(hyperparameters)
         # Random Forest Regressor
-        model_name_list.append("random_forest")
-        model_list.append(RandomForestRegressor())
+        model_name_list_r.append("random_forest")
+        model_list_r.append(RandomForestRegressor())
         hyperparameters = {
             "n_estimators": [10, 50, 100, 200, 400],
             "criterion": ["squared_error", "friedman_mse", "poisson"],
             "min_samples_leaf": [1, 2, 4], 
             "bootstrap": [True, False] 
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_r.append(hyperparameters)
         # Gradient Boosting Regressor
-        model_name_list.append("gradient_boosting")
-        model_list.append(GradientBoostingRegressor())
+        model_name_list_r.append("gradient_boosting")
+        model_list_r.append(GradientBoostingRegressor())
         hyperparameters = {
             "n_estimators": [10, 50, 100, 200, 400],
             "loss": ["squared_error", "absolute_error", "huber"],
             "min_samples_leaf": [1, 2, 4],
-            "learning_rate": [0.001, 0.01, 0.1, 0.2]
+            "learning_rate": [0.01, 0.1, 0.2, 0.5, 1.0]
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_r.append(hyperparameters)
         # SGD Regressor
-        model_name_list.append("sgd_regressor")
-        model_list.append(SGDRegressor())
+        model_name_list_r.append("sgd_regressor")
+        model_list_r.append(SGDRegressor())
         hyperparameters = {
-            "alpha": [0.00001, 0.001, 0.1, 10.0],
-            "max_iter": [100, 400, 700, 1000], 
+            "penalty": ['l2', 'l1', 'elasticnet', 'None'], 
+            "alpha": [0.001, 0.1, 10.0, 30.0, 100.0],
+            "max_iter": [1000, 5000, 10000, 50000, 100000], 
             "learning_rate": ['constant'],
-            "eta0": [0.01, 0.04, 0.07, 0.1],
-            "power_t": [0.1, 0.5, 0.9]
+            "eta0": [0.0001, 0.001, 0.01, 0.1, 1.0],
+            "power_t": [0.01, 0.05, 0.1, 0.3, 0.5]
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_r.append(hyperparameters)
     elif (task_folder == "classification"):
         print("Reached classification")
         # Decision Tree Classifier
-        model_name_list.append("decision_tree")
-        model_list.append(DecisionTreeClassifier())
+        model_name_list_c.append("decision_tree")
+        model_list_c.append(DecisionTreeClassifier())
         hyperparameters = {
-            "max_depth": [2, 5, 10, 20],
+            "max_depth": [1, 2, 3, 6, 10, 15, 25],
             "criterion": ["gini", "entropy", "log_loss"],
-            "min_samples_leaf": [1, 2, 4], 
-            "min_samples_split": [2, 4, 8]
+            "min_samples_leaf": [1, 2, 4, 8, 12, 16, 32, 64], 
+            "min_samples_split": [1, 2, 4, 8, 12, 16, 32, 64]
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_c.append(hyperparameters)
         # Random Forest Classifier
-        model_name_list.append("random_forest")
-        model_list.append(RandomForestClassifier())
+        model_name_list_c.append("random_forest")
+        model_list_c.append(RandomForestClassifier())
         hyperparameters = {
-            "n_estimators": [10, 50, 100, 200, 400],
+            "n_estimators": [5, 10, 20, 50, 100, 200, 500, 1000, 2000],
             "criterion": ["gini", "entropy", "log_loss"],
-            "min_samples_leaf": [1, 2, 4], 
-            "bootstrap": [True, False] 
+            "min_samples_leaf": [1, 2, 4, 8, 12, 16, 32], 
+            "bootstrap": [True] 
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_c.append(hyperparameters)
         # Gradient Boosting Classifier
-        model_name_list.append("gradient_boosting")
-        model_list.append(GradientBoostingClassifier())
+        model_name_list_c.append("gradient_boosting")
+        model_list_c.append(GradientBoostingClassifier())
         hyperparameters = {
-            "n_estimators": [10, 50, 100, 200, 400],
+            "n_estimators": [100, 200, 500, 1000, 2000, 4000, 8000],
             "criterion": ["friedman_mse", "squared_error"],
-            "min_samples_leaf": [1, 2, 4],
-            "learning_rate": [0.001, 0.01, 0.1, 0.2]
+            "min_samples_leaf": [1, 2, 4, 8, 12, 16],
+            "learning_rate": [0.00001, 0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2]
         }
-        hyperparameter_list.append(hyperparameters)
+        hyperparameter_list_c.append(hyperparameters)
         # Logistic Regression
-        model_name_list.append("logistic_regression")
-        model_list.append(LogisticRegression())
+        model_name_list_c.append("logistic_regression")
+        model_list_c.append(LogisticRegression())
         hyperparameters = {
             "solver": ["newton-cg", "newton-cholesky", "sag", "saga"],
-            "max_iter": [10, 50, 100, 200],
-            "C": [0.5, 1, 2]
+            "max_iter": [2, 5, 10, 50, 100],
+            "C": [0.01, 0.1, 0.5, 1, 2, 4, 8]
         }
-        hyperparameter_list.append(hyperparameters)
-        print("Model name list:", model_name_list)
+        hyperparameter_list_c.append(hyperparameters)
+        print("Model name list:", model_name_list_c)
     # end if
     if (task_folder == "regression"):
-        for item in range(0, len(model_list)):
+        for item in range(0, len(model_list_r)):
             print("regression item = ", item)
-            best_estimator, best_params, best_score = tune_regression_model_hyperparameters(model_list[item], hyperparameter_list[item])
-            print_and_save(best_estimator, best_params, best_score, task_folder, model_name_list[item])
+            best_estimator, best_params, best_score = tune_regression_model_hyperparameters(model_list_r[item], hyperparameter_list_r[item])
+            print_and_save(best_estimator, best_params, best_score, task_folder, model_name_list_r[item])
         # end for
     elif (task_folder == "classification"):
-        for item in range(0, len(model_list)):
+        for item in range(0, len(model_list_c)):
             print("classification item = ", item)
-            best_estimator, best_params, best_score = tune_classification_model_hyperparameters(model_list[item], hyperparameter_list[item])
-            print_and_save(best_estimator, best_params, best_score, task_folder, model_name_list[item])
+            best_estimator, best_params, best_score = tune_classification_model_hyperparameters(model_list_c[item], hyperparameter_list_c[item])
+            print_and_save(best_estimator, best_params, best_score, task_folder, model_name_list_c[item])
         # end for
     # end for
 # end evaluate_all_models
@@ -408,7 +410,7 @@ def find_best_sgdregressor(X_train, X_test, X_validation):
     test_set = X_test
     hyperparameters = {
         "alpha": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
-        "max_iter": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 
+        "max_iter": [500, 1000, 5000, 10000, 50000], 
         "learning_rate": ['constant'],  # constant for eta0; 
                                         # invscaling for power_t
         "eta0": [0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1],
@@ -552,7 +554,7 @@ def tune_classification_model_hyperparameters(model, hyperparameters):
     - best_score = the value of the best result from GridSearchCV
     '''
 
-    clf = GridSearchCV(model, hyperparameters, scoring='accuracy')
+    clf = GridSearchCV(model, hyperparameters, scoring='accuracy', cv=5)
     clf.fit(X_train, y_train)
     best_estimator = clf.best_estimator_
     best_score = clf.best_score_
@@ -675,22 +677,22 @@ if __name__ == "__main__":
     df = features_labels_tuple[0]
     X, y, X_train, y_train, X_test, y_test, X_validation, y_validation = split_data(df)
     # Evaluate SGDregressor model
-    evaluate_sgdregressor(X, y, X_train, y_train, X_test, y_test)
-    find_best_sgdregressor(X_train, X_test, X_validation)
+    #evaluate_sgdregressor(X, y, X_train, y_train, X_test, y_test)
+    #find_best_sgdregressor(X_train, X_test, X_validation)
     # Evaluate a set of alternative regression models
     evaluate_all_models("regression")
     # Find the best regression model from those processed earlier
-    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
+    #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("regression")
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
     # Train and evaluate logistic regression
-    train_and_evaluate_logistic_regression()
+    #train_and_evaluate_logistic_regression()
     # Evaluate a set of alternative classification models
-    evaluate_all_models("classification")
+    #evaluate_all_models("classification")
     # Find the best classification model from those processed earlier
-    loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
-    print("loaded model = ", loaded_model)
-    print("hyperparameter dictionary = ", hyperparameter_dictionary)
-    print("metrics dictionary = ", metrics_dictionary)
+    #loaded_model, hyperparameter_dictionary, metrics_dictionary = find_best_model("classification")
+    #print("loaded model = ", loaded_model)
+    #print("hyperparameter dictionary = ", hyperparameter_dictionary)
+    #print("metrics dictionary = ", metrics_dictionary)
 # end if

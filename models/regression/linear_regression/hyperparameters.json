@@ -1,1 +1,1 @@
-{"alpha": 0.001, "eta0": 0.09, "learning_rate": "constant", "max_iter": 700, "power_t": 0.4}
+{"alpha": 0.001, "eta0": 0.1, "learning_rate": "constant", "max_iter": 5000, "power_t": 0.5}
