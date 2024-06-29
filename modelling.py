@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Sat 22 Jun 2024 at 12:01 UT 
+Last modified on Sat 29 Jun 2024 at 12:58 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -278,42 +278,54 @@ def evaluate_all_models(task_folder):
         model_name_list_r.append("decision_tree")
         model_list_r.append(DecisionTreeRegressor())
         hyperparameters = {
-            "max_depth": [2, 5, 10, 20, 50],
+            "ccp_alpha": [0.3, 0.9, 3.0], 
             "criterion": ["squared_error", "friedman_mse", "poisson"],
-            "min_samples_leaf": [1, 2, 4],
-            "min_samples_split": [2, 4, 8]
+            "max_depth": [1, 2],
+            "max_features": [1, 2], 
+            "min_impurity_decrease": [0.5, 0.9, 2.0, 5.0], 
+            "min_samples_leaf": [10, 15],
+            "min_samples_split": [1, 2, 3], 
+            "min_weight_fraction_leaf": [0.3, 0.5]
         }
         hyperparameter_list_r.append(hyperparameters)
         # Random Forest Regressor
         model_name_list_r.append("random_forest")
         model_list_r.append(RandomForestRegressor())
         hyperparameters = {
-            "n_estimators": [10, 50, 100, 200, 400],
+            "bootstrap": [True, False], 
+            "ccp_alpha": [0.99, 2, 3], 
             "criterion": ["squared_error", "friedman_mse", "poisson"],
+            "max_depth": [1, 2],
+            "max_features": [1, 2], 
             "min_samples_leaf": [1, 2, 4], 
-            "bootstrap": [True, False] 
+            "min_samples_split": [15, 20], 
+            "n_estimators": [10, 100]
         }
         hyperparameter_list_r.append(hyperparameters)
         # Gradient Boosting Regressor
         model_name_list_r.append("gradient_boosting")
         model_list_r.append(GradientBoostingRegressor())
         hyperparameters = {
-            "n_estimators": [10, 50, 100, 200, 400],
+            "learning_rate": [0.01, 0.05], 
             "loss": ["squared_error", "absolute_error", "huber"],
-            "min_samples_leaf": [1, 2, 4],
-            "learning_rate": [0.01, 0.1, 0.2, 0.5, 1.0]
+            "max_depth": [1, 2],
+            "max_features": [1, 2], 
+            "min_impurity_decrease": [0.2, 0.3], 
+            "min_samples_leaf": [6, 10],
+            "min_samples_split": [15, 20], 
+            "n_estimators": [5, 10]
         }
         hyperparameter_list_r.append(hyperparameters)
         # SGD Regressor
         model_name_list_r.append("sgd_regressor")
         model_list_r.append(SGDRegressor())
         hyperparameters = {
-            "penalty": ['l2', 'l1', 'elasticnet', 'None'], 
-            "alpha": [0.001, 0.1, 10.0, 30.0, 100.0],
-            "max_iter": [1000, 5000, 10000, 50000, 100000], 
+            "alpha": [0.00001, 0.0001, 0.001],
+            "eta0": [0.00001, 0.0001, 0.001],
             "learning_rate": ['constant'],
-            "eta0": [0.0001, 0.001, 0.01, 0.1, 1.0],
-            "power_t": [0.01, 0.05, 0.1, 0.3, 0.5]
+            "max_iter": [1000, 5000, 10000], 
+            "penalty": ['l2', 'l1', 'elasticnet', 'None'], 
+            "power_t": [0.3, 0.5, 0.9]
         }
         hyperparameter_list_r.append(hyperparameters)
     elif (task_folder == "classification"):

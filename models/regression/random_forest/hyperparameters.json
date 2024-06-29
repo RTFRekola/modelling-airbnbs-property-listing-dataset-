@@ -1,1 +1,1 @@
-{"bootstrap": true, "criterion": "friedman_mse", "min_samples_leaf": 4, "n_estimators": 50}
+{"bootstrap": true, "ccp_alpha": 0.99, "criterion": "squared_error", "max_depth": 2, "max_features": 2, "min_samples_leaf": 2, "min_samples_split": 20, "n_estimators": 10}

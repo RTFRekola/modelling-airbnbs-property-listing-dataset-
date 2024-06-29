@@ -1,1 +1,1 @@
-{"learning_rate": 0.5, "loss": "absolute_error", "min_samples_leaf": 4, "n_estimators": 50}
+{"learning_rate": 0.05, "loss": "squared_error", "max_depth": 2, "max_features": 2, "min_impurity_decrease": 0.2, "min_samples_leaf": 6, "min_samples_split": 20, "n_estimators": 10}
