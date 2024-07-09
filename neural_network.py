@@ -215,11 +215,12 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
     inference_latency_items = []
     cross_entropy_items = []
     accuracy_items = []
-    f1_score__items = []
+    f1_score_items = []
     precision_items = []
     recall_items = []
     for epoch in range(epochs):
-        accuracy_score = 0 ; i = 0
+        #accuracy_score = 0.0 ; i = 0
+        i = 0
         for batch in loader:
             i += 1
             features, labels = batch
@@ -230,20 +231,39 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
             datetime_after = datetime.now()
             inference_latency_items.append((datetime_after - datetime_before).total_seconds())
             # Find cross entropy
-            y_tensor_initial = torch.tensor(y_test.values)
+            #y_tensor = labels.values
+            #y_tensor = torch.tensor(labels.float())
             prediction_tensor = prediction.float()
-            y_tensor = y_tensor_initial.reshape((128,))
-            print("size, y, pred = ", y_tensor.shape, prediction_tensor.shape)
+            #print("size, y, pred = ", y_tensor.shape, prediction_tensor.shape)
             #prediction_tensor = torch.tensor(prediction.values)
-            cross_entropy_items.append(f.cross_entropy(prediction_tensor, y_tensor))
+            cross_entropy_items.append(f.cross_entropy(prediction_tensor, labels))
             # Find accuracy
-            accuracy_items.append(accuracy_score(y_test, prediction))
+            #accuracy_items.append(accuracy_score(labels.float(), prediction.float()))
+           # accuracy_items.append(accuracy_score(labels.float().detach().numpy(), prediction.float().detach().numpy()))
+            #accuracy_items.append(accuracy_score(labels.detach().numpy(), prediction.detach().numpy()))
+            #accuracy_items.append(accuracy_score(labels, prediction))
+            #accuracy_items.append(accuracy_score(labels, prediction_tensor))
+            #accuracy_items.append(accuracy_score(labels.detach().numpy(), prediction_tensor.detach().numpy()))
+            #accuracy_items.append(accuracy_score(labels, prediction_tensor.detach().numpy()))
+            #print("labels =", labels)
+            #print("prediction_tensor =", prediction_tensor)
+            labels1 = labels.tolist()
+            prediction_tensor1 = prediction_tensor.tolist()
+            labels0 = sum(labels1, [])
+            prediction_tensor0 = sum(prediction_tensor1, [])
+#            print("labels0 =", labels0)
+#            print("prediction_tensor0 =", prediction_tensor0)
+            labels0 = [ int(x) for x in labels0 ]
+            prediction_tensor0 = [ int(x) for x in prediction_tensor0 ]
+#            print("labels0 =", labels0)
+#            print("prediction_tensor0 =", prediction_tensor0)
+            accuracy_items.append(accuracy_score(labels0, prediction_tensor0))
             # Find the F1 score
-            f1_score_items.append(f1_score(y_test, prediction))
+            f1_score_items.append(f1_score(labels0, prediction_tensor0, average='macro'))
             # Find precision
-            precision_items.append(precision_score(y_test, prediction))
+            precision_items.append(precision_score(labels0, prediction_tensor0, average='macro'))
             # Find recall
-            recall_items.append(recall_score(y_test, prediction))
+            recall_items.append(recall_score(labels0, prediction_tensor0, average='macro'))
             # Optimisation step
             optimiser.step()
             optimiser.zero_grad()
@@ -254,11 +274,11 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
     # Finalise the values for metrics 
     cross_entropy_value = sum(cross_entropy_items) / len(cross_entropy_items)
     accuracy = sum(accuracy_items) / len(accuracy_items)
-    f1_score = sum(f1_score_items) / len(f1_score_items)
+    f1_score_value = sum(f1_score_items) / len(f1_score_items)
     precision = sum(precision_items) / len(precision_items)
     recall = sum(recall_items) / len(recall_items)
     inference_latency = sum(inference_latency_items) / len(inference_latency_items)
-    return cross_entropy_value, accuracy, f1_score, precision, recall, inference_latency
+    return cross_entropy_value, accuracy, f1_score_value, precision, recall, inference_latency
 # end train_classifier
 
 
@@ -322,9 +342,9 @@ def find_best_nn(config, train_loader, the_label):
         hyperparameters['hidden_layer_width'] = item[1]
         hyperparameters['model_depth'] = item[2]
         hyperparameters['learning_rate'] = item[3]
-<        model = Neural_Network(item[1], item[2])
+        model = Neural_Network(item[1], item[2])
         if (the_label == "Category"):
-            cross_entropy_value, accuracy, f1_score, precision, recall = train_classifier(model, train_loader, epochs, item[0], item[3])
+            cross_entropy_value, accuracy, f1_score_value, precision, recall, inference_latency = train_classifier(model, train_loader, epochs, item[0], item[3])
         else:
             rmse_loss, r2_score, inference_latency = train(model, train_loader, 
                                                        epochs, item[0], 
@@ -334,19 +354,21 @@ def find_best_nn(config, train_loader, the_label):
         training_duration = (datetime_end - datetime_beg).total_seconds()
         if (the_label == "Category"):
             metrics = {'Accuracy': float(accuracy)}
-            metrics['F1 score'] = float(f1_score)
+            metrics['F1 score'] = float(f1_score_value)
             metrics['Precision'] = float(precision)
             metrics['Recall'] = float(recall)
             metrics['Cross entropy'] = float(cross_entropy_value)
+            reference_value = float(cross_entropy_value)
         else:
             metrics = {'RMSE_loss': float(rmse_loss)}
             metrics['R^2 score'] = float(r2_score)
+            reference_value = float(rmse_loss)
         # end if
         metrics['training_duration'] = float(training_duration)
         metrics['inference_latency'] = float(inference_latency)
         folder = 'neural_networks'
         save_model(folder, model, hyperparameters, metrics)
-        if (rmse_loss < loss_function_baseline):
+        if (reference_value < loss_function_baseline):
             folder = 'best_nn'
             save_model(folder, model, hyperparameters, metrics)
             if (the_label == "Category"):

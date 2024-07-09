@@ -12,6 +12,7 @@ Modelling Airbnb's Property Listing Dataset
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 
 # ==============================================
@@ -139,9 +140,14 @@ def load_airbnb(in_label):
     '''
 
     df = pd.read_csv("../airbnb-local/tabular_data/clean_tabular_data.csv")
-    df = df.replace(['Treehouses', 'Category', 
-                     'Chalets', 'Amazing pools', 'Offbeat', 
-                     'Beachfront'], [1, 1, 2, 3, 4, 5])
+    #df = df.replace(['Treehouses', 'Category', 
+    #                 'Chalets', 'Amazing pools', 'Offbeat', 
+    #                 'Beachfront'], [1, 1, 2, 3, 4, 5])
+    df = df.replace(['Treehouses'], ['Category'])
+    le = LabelEncoder()
+    df['Category'] = le.fit_transform(df['Category'])
+    #df['Category'].unique()
+    
     # Change column type of these columns into numbers
     label_price_night = "Price_Night"
     label_category = "Category"
