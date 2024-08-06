@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Sat 29 Jun 2024 at 16:33 UT 
+Last modified on Sun 4 Aug 2024 at 12:51 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -73,28 +73,29 @@ class Neural_Network(torch.nn.Module):
     Variables: 
     layers = list of instantiated models for Sequential, internal in get_net
     self.config = hyperparameter dictionary, input with function call
-    self.depth = model depth
+    self.depth_value = model depth
     self.layers = sequence of applications of the model to cover the depth of 
                   the neural network
-    self.width = hidden layer width
+    self.width_value = hidden layer width
     step = loop parameter, internal in get_net
     '''
 
-    def __init__(self, width_value, depth_value):
+    def __init__(self, width_value, depth_value, number_of_classes):
         super().__init__()
         self.width_value = width_value
         self.depth_value = depth_value
+        self.number_of_classes = number_of_classes
         
         # Define layers.
-        self.layers = torch.nn.Sequential(*self.get_net(self.width_value, self.depth_value))
+        self.layers = torch.nn.Sequential(*self.get_net(self.width_value, self.depth_value, self.number_of_classes))
 
-    def get_net(self, width_value, depth_value):
+    def get_net(self, width_value, depth_value, number_of_classes):
         layers = [torch.nn.Linear(12, width_value), torch.nn.ReLU()]
         for step in range(depth_value-1):
             layers.append(torch.nn.Linear(width_value, width_value))
             layers.append(torch.nn.ReLU())
         # end for
-        layers.append(torch.nn.Linear(width_value, 1))
+        layers.append(torch.nn.Linear(width_value, number_of_classes))
         return layers
 
     def forward(self, X):
@@ -231,32 +232,15 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
             datetime_after = datetime.now()
             inference_latency_items.append((datetime_after - datetime_before).total_seconds())
             # Find cross entropy
-            #y_tensor = labels.values
-            #y_tensor = torch.tensor(labels.float())
             prediction_tensor = prediction.float()
-            #print("size, y, pred = ", y_tensor.shape, prediction_tensor.shape)
-            #prediction_tensor = torch.tensor(prediction.values)
-            cross_entropy_items.append(f.cross_entropy(prediction_tensor, labels))
-            # Find accuracy
-            #accuracy_items.append(accuracy_score(labels.float(), prediction.float()))
-           # accuracy_items.append(accuracy_score(labels.float().detach().numpy(), prediction.float().detach().numpy()))
-            #accuracy_items.append(accuracy_score(labels.detach().numpy(), prediction.detach().numpy()))
-            #accuracy_items.append(accuracy_score(labels, prediction))
-            #accuracy_items.append(accuracy_score(labels, prediction_tensor))
-            #accuracy_items.append(accuracy_score(labels.detach().numpy(), prediction_tensor.detach().numpy()))
-            #accuracy_items.append(accuracy_score(labels, prediction_tensor.detach().numpy()))
-            #print("labels =", labels)
-            #print("prediction_tensor =", prediction_tensor)
+            #####cross_entropy_items.append(f.cross_entropy(prediction_tensor, labels))
             labels1 = labels.tolist()
             prediction_tensor1 = prediction_tensor.tolist()
             labels0 = sum(labels1, [])
             prediction_tensor0 = sum(prediction_tensor1, [])
-#            print("labels0 =", labels0)
-#            print("prediction_tensor0 =", prediction_tensor0)
             labels0 = [ int(x) for x in labels0 ]
             prediction_tensor0 = [ int(x) for x in prediction_tensor0 ]
-#            print("labels0 =", labels0)
-#            print("prediction_tensor0 =", prediction_tensor0)
+            # Find accuracy
             accuracy_items.append(accuracy_score(labels0, prediction_tensor0))
             # Find the F1 score
             f1_score_items.append(f1_score(labels0, prediction_tensor0, average='macro'))
@@ -267,12 +251,11 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
             # Optimisation step
             optimiser.step()
             optimiser.zero_grad()
-            #writer.add_scalar('loss', rmse_loss.item(), batch_idx)
             batch_idx += 1
         # end for
     # end for
     # Finalise the values for metrics 
-    cross_entropy_value = sum(cross_entropy_items) / len(cross_entropy_items)
+    cross_entropy_value = 1.0 #####sum(cross_entropy_items) / len(cross_entropy_items)
     accuracy = sum(accuracy_items) / len(accuracy_items)
     f1_score_value = sum(f1_score_items) / len(f1_score_items)
     precision = sum(precision_items) / len(precision_items)
@@ -342,10 +325,11 @@ def find_best_nn(config, train_loader, the_label):
         hyperparameters['hidden_layer_width'] = item[1]
         hyperparameters['model_depth'] = item[2]
         hyperparameters['learning_rate'] = item[3]
-        model = Neural_Network(item[1], item[2])
         if (the_label == "Category"):
+            model = Neural_Network(item[1], item[2], 13)
             cross_entropy_value, accuracy, f1_score_value, precision, recall, inference_latency = train_classifier(model, train_loader, epochs, item[0], item[3])
         else:
+            model = Neural_Network(item[1], item[2], 1)
             rmse_loss, r2_score, inference_latency = train(model, train_loader, 
                                                        epochs, item[0], 
                                                        item[3])

@@ -82,4 +82,4 @@ Copying and distribution of these files, with or without modification, are permi
 
 ## Project History
 
-See the [Projec<t History in Wiki](https://github.com/RTFRekola/modelling-airbnbs-property-listing-dataset-/wiki). This includes outcomes of the models and their metrics, with some awesome graphics, too. 
+See the [Project History in Wiki](https://github.com/RTFRekola/modelling-airbnbs-property-listing-dataset-/wiki). This includes outcomes of the models and their metrics, with some awesome graphics, too. 
