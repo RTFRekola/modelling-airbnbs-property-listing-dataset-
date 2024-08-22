@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Mon 12 Jun 2023 at 18:36 UT
-Last modified on Sat 13 Jan 2024 at 16:33 UT
+Last modified on Thu 8 Aug 2024 at 14:29 UT
 
 @author: Rami T. F. Rekola 
 
@@ -140,13 +140,10 @@ def load_airbnb(in_label):
     '''
 
     df = pd.read_csv("../airbnb-local/tabular_data/clean_tabular_data.csv")
-    #df = df.replace(['Treehouses', 'Category', 
-    #                 'Chalets', 'Amazing pools', 'Offbeat', 
-    #                 'Beachfront'], [1, 1, 2, 3, 4, 5])
+    del df['Unnamed: 19']
     df = df.replace(['Treehouses'], ['Category'])
     le = LabelEncoder()
     df['Category'] = le.fit_transform(df['Category'])
-    #df['Category'].unique()
     
     # Change column type of these columns into numbers
     label_price_night = "Price_Night"
@@ -174,60 +171,6 @@ def load_airbnb(in_label):
                    "Communication_rating", "Location_rating", 
                    "Check-in_rating", "Value_rating", "amenities_count", 
                    label_2, label_3]
-    '''
-    if (in_label == "Price_Night"):
-        df[["Price_Night", "guests", "beds", "bathrooms", "Cleanliness_rating", 
-            "Accuracy_rating", "Communication_rating", "Location_rating", 
-            "Check-in_rating", "Value_rating", "amenities_count", 
-            "bedrooms"]] = df[["Price_Night", "guests", "beds", "bathrooms", 
-                               "Cleanliness_rating", "Accuracy_rating", 
-                               "Communication_rating", "Location_rating", 
-                               "Check-in_rating", "Value_rating", 
-                               "amenities_count", 
-                               "bedrooms"]].apply(pd.to_numeric)
-        labels_list = ["Price_Night", "guests", "beds", "bathrooms", 
-                       "Cleanliness_rating", "Accuracy_rating", 
-                       "Communication_rating", "Location_rating", 
-                       "Check-in_rating", "Value_rating", "amenities_count", 
-                       "bedrooms"]
-        labels_list.append("Category")
-        # labels_list.append("bedrooms")
-    elif (in_label == "Category"):
-        df[["Category", "guests", "beds", "bathrooms", "Cleanliness_rating", 
-            "Accuracy_rating", "Communication_rating", "Location_rating", 
-            "Check-in_rating", "Value_rating", "amenities_count", 
-            "bedrooms"]] = df[["Category", "guests", "beds", "bathrooms", 
-                               "Cleanliness_rating", "Accuracy_rating", 
-                               "Communication_rating", "Location_rating", 
-                               "Check-in_rating", "Value_rating", 
-                               "amenities_count", 
-                               "bedrooms"]].apply(pd.to_numeric)
-        labels_list = ["Category", "guests", "beds", "bathrooms", 
-                       "Cleanliness_rating", "Accuracy_rating", 
-                       "Communication_rating", "Location_rating", 
-                       "Check-in_rating", "Value_rating", "amenities_count", 
-                       "bedrooms"]
-        labels_list.append("Price_Night")
-        # labels_list.append("bedrooms")
-    elif (in_label == "bedrooms"):
-        df[["bedrooms", "guests", "beds", "bathrooms", "Cleanliness_rating", 
-            "Accuracy_rating", "Communication_rating", "Location_rating", 
-            "Check-in_rating", "Value_rating", "amenities_count", 
-            "Price_Night"]] = df[["bedrooms", "guests", "beds", "bathrooms", 
-                                  "Cleanliness_rating", "Accuracy_rating", 
-                                  "Communication_rating", "Location_rating", 
-                                  "Check-in_rating", "Value_rating", 
-                                  "amenities_count", 
-                                  "Price_Night"]].apply(pd.to_numeric)
-        labels_list = ["bedrooms", "guests", "beds", "bathrooms", 
-                       "Cleanliness_rating", "Accuracy_rating", 
-                       "Communication_rating", "Location_rating", 
-                       "Check-in_rating", "Value_rating", "amenities_count", 
-                       "Price_Night"]
-        labels_list.append("Category")
-        # labels_list.append("Price_Night")
-    # end if
-    '''
     df_selection = df[labels_list]
     df_selection.columns = ['', '', '', '', '', '', '', '', '', '', '', 
                             '', '']

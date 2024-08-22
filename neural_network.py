@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Thu 6 Jul 2023 at 19:50 UT
-Last modified on Sun 4 Aug 2024 at 12:51 UT 
+Last modified on Sun 15 Aug 2024 at 12:07 UT 
 
 @author: Rami T. F. Rekola 
 
@@ -26,7 +26,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.model_selection import GridSearchCV, train_test_split
-# from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler
 from tabular_data import load_airbnb
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.tensorboard import SummaryWriter
@@ -56,8 +56,8 @@ class AirbnbNightlyPriceRegressionDataset(Dataset):
 
     def __getitem__(self, index):
         example = self.data.iloc[index]
-        self.features = example[1:]
-        self.label = example[0]
+        self.features = torch.tensor(example[1:]).float()
+        self.label = torch.tensor(example[0]).long()
         return (torch.tensor(self.features).float(), self.label)
 
     def __len__(self):
@@ -87,7 +87,8 @@ class Neural_Network(torch.nn.Module):
         self.number_of_classes = number_of_classes
         
         # Define layers.
-        self.layers = torch.nn.Sequential(*self.get_net(self.width_value, self.depth_value, self.number_of_classes))
+        self.layers = torch.nn.Sequential(*self.get_net(self.width_value, 
+self.depth_value, self.number_of_classes))
 
     def get_net(self, width_value, depth_value, number_of_classes):
         layers = [torch.nn.Linear(12, width_value), torch.nn.ReLU()]
@@ -150,10 +151,12 @@ def train(model, loader, epochs, optimiser_value, learning_rate_value):
             datetime_before = datetime.now()
             prediction = model(features)
             datetime_after = datetime.now()
-            inference_latency_items.append((datetime_after - datetime_before).total_seconds())
+            inference_latency_items.append((datetime_after - 
+                                            datetime_before).total_seconds())
             # Find the RMSE loss
             loss_function = torch.nn.MSELoss()
-            rmse_loss = torch.sqrt(loss_function(prediction.float(), labels.float()))
+            rmse_loss = torch.sqrt(loss_function(prediction.float(), 
+                                                 labels.float()))
             rmse_loss.backward()
             rmse_loss_items.append(rmse_loss)
             # Find the R^2 score
@@ -207,7 +210,8 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
     if (optimiser_value == 'SGD'):
         optimiser = torch.optim.SGD(model.parameters(), lr=learning_rate_value)
     elif (optimiser_value == 'Adagrad'):
-        optimiser = torch.optim.Adagrad(model.parameters(), lr=learning_rate_value)
+        optimiser = torch.optim.Adagrad(model.parameters(), 
+                                        lr=learning_rate_value)
     elif (optimiser_value == 'Adam'):
         optimiser = torch.optim.Adam(model.parameters(), lr=learning_rate_value)
     # end if
@@ -220,47 +224,50 @@ def train_classifier(model, loader, epochs, optimiser_value, learning_rate_value
     precision_items = []
     recall_items = []
     for epoch in range(epochs):
-        #accuracy_score = 0.0 ; i = 0
         i = 0
         for batch in loader:
             i += 1
             features, labels = batch
-            labels = labels.unsqueeze(1)
+            labels = labels.squeeze()
             # Find the time it takes to make the prediction
             datetime_before = datetime.now()
             prediction = model(features)
             datetime_after = datetime.now()
-            inference_latency_items.append((datetime_after - datetime_before).total_seconds())
+            labels0 = labels ; prediction_tensor0 = prediction
+            inference_latency_items.append((datetime_after - 
+                                            datetime_before).total_seconds())
             # Find cross entropy
-            prediction_tensor = prediction.float()
-            #####cross_entropy_items.append(f.cross_entropy(prediction_tensor, labels))
-            labels1 = labels.tolist()
-            prediction_tensor1 = prediction_tensor.tolist()
-            labels0 = sum(labels1, [])
-            prediction_tensor0 = sum(prediction_tensor1, [])
-            labels0 = [ int(x) for x in labels0 ]
-            prediction_tensor0 = [ int(x) for x in prediction_tensor0 ]
+            loss = f.cross_entropy(prediction, labels)
+            cross_entropy_items.append(loss.item())
+            _, predicted = torch.max(prediction, 1)
+            prediction = prediction.detach().numpy()
+            labels = labels.numpy()
+            prediction = predicted.numpy()
             # Find accuracy
-            accuracy_items.append(accuracy_score(labels0, prediction_tensor0))
+            accuracy_items.append(accuracy_score(labels, prediction))
             # Find the F1 score
-            f1_score_items.append(f1_score(labels0, prediction_tensor0, average='macro'))
+            f1_score_items.append(f1_score(labels, prediction, average='macro'))
             # Find precision
-            precision_items.append(precision_score(labels0, prediction_tensor0, average='macro'))
+            precision_items.append(precision_score(labels, prediction, 
+                                                   average='macro'))
             # Find recall
-            recall_items.append(recall_score(labels0, prediction_tensor0, average='macro'))
+            recall_items.append(recall_score(labels, prediction, 
+                                             average='macro'))
             # Optimisation step
             optimiser.step()
             optimiser.zero_grad()
+            writer.add_scalar('loss', loss.item(), batch_idx)
             batch_idx += 1
         # end for
     # end for
     # Finalise the values for metrics 
-    cross_entropy_value = 1.0 #####sum(cross_entropy_items) / len(cross_entropy_items)
+    cross_entropy_value = sum(cross_entropy_items) / len(cross_entropy_items)
     accuracy = sum(accuracy_items) / len(accuracy_items)
     f1_score_value = sum(f1_score_items) / len(f1_score_items)
     precision = sum(precision_items) / len(precision_items)
     recall = sum(recall_items) / len(recall_items)
-    inference_latency = sum(inference_latency_items) / len(inference_latency_items)
+    inference_latency = (sum(inference_latency_items) / 
+                         len(inference_latency_items))
     return cross_entropy_value, accuracy, f1_score_value, precision, recall, inference_latency
 # end train_classifier
 
@@ -276,7 +283,7 @@ def get_nn_config():
 # end get_nn_config
 
 
-def find_best_nn(config, train_loader, the_label):
+def find_best_nn(config, train_loader, the_label, number_of_classes):
 
     '''
     This function goes through all different combinations of hyperparameters 
@@ -310,7 +317,7 @@ def find_best_nn(config, train_loader, the_label):
     - training_duration = time taken to train the model
     '''
 
-    epochs = 100
+    epochs = 200
     loss_function_baseline = 999.9
     optimiser_list = config['optimiser']
     hidden_layer_width_list = config['hidden_layer_width']
@@ -326,7 +333,7 @@ def find_best_nn(config, train_loader, the_label):
         hyperparameters['model_depth'] = item[2]
         hyperparameters['learning_rate'] = item[3]
         if (the_label == "Category"):
-            model = Neural_Network(item[1], item[2], 13)
+            model = Neural_Network(item[1], item[2], number_of_classes)
             cross_entropy_value, accuracy, f1_score_value, precision, recall, inference_latency = train_classifier(model, train_loader, epochs, item[0], item[3])
         else:
             model = Neural_Network(item[1], item[2], 1)
@@ -352,6 +359,7 @@ def find_best_nn(config, train_loader, the_label):
         metrics['inference_latency'] = float(inference_latency)
         folder = 'neural_networks'
         save_model(folder, model, hyperparameters, metrics)
+        print("reference_value, loss_function_baseline = ", reference_value, loss_function_baseline)
         if (reference_value < loss_function_baseline):
             folder = 'best_nn'
             save_model(folder, model, hyperparameters, metrics)
@@ -406,9 +414,6 @@ elif (the_label == "Category"):
 elif (the_label == "bedrooms"):
     features_labels_tuple = load_airbnb("bedrooms")
 # end if
-# Using sklearn to train a linear regression model to predict a feature from 
-# the tabular data. Keep one of the lines above uncommented and comment the 
-# other two. 
 df = features_labels_tuple[0]
 X, y, X_train, y_train, X_test, y_test, X_validation, y_validation = split_data(df)
 #print(df.dtypes)
@@ -417,42 +422,50 @@ if __name__ == '__main__':
     config = get_nn_config()
     # Prepare the neural network dataset.
     dataset = AirbnbNightlyPriceRegressionDataset()
-    train_len = int(len(dataset)*0.8)
-    train_set, test_set = torch.utils.data.random_split(dataset, [train_len, len(dataset)-train_len])
+    train_len = int(len(dataset)*0.7)
+    val_len = int(len(dataset)*0.15)
+    test_len = len(dataset) - train_len - val_len
+    train_set, val_set, test_set = torch.utils.data.random_split(dataset, [train_len, val_len, test_len])
     # Prepare the neural network dataloaders.
-    train_loader = DataLoader(train_set, shuffle=True, batch_size=128)
-    test_loader = DataLoader(test_set, shuffle=False, batch_size=128)
-    train_len = int(len(train_set)*0.5)      
+    train_loader = DataLoader(train_set, shuffle=True, batch_size=16)
+    test_loader = DataLoader(test_set, shuffle=False, batch_size=16)
+    val_loader = DataLoader(train_set, shuffle=False, batch_size=16)
     train_set, validation_set = torch.utils.data.random_split(train_set, [train_len, len(train_set)-train_len])
-#    scaler = StandardScaler()
-    X_train_scaled = X_train  # This is a temporary notation
-#    X_train_scaled = scaler.fit_transform(X_train)
-    X_validation_scaled = X_validation  # This is a temporary notation
-#    X_validation_scaled = scaler.transform(X_validation)
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_validation_scaled = scaler.transform(X_validation)
     # Prepare the features and labels for the neural network model.
     example = next(iter(train_loader))
     features, labels = example
-    # Run tests on the data, uncomment one of the lines below, comment the 
-    # other one
-    #run_type = "individual"
-    run_type = "neural_network"
+    # Run the code either as an individual test run or as a neural network
+    run_type = "neural_network"   # "individual" or "neural_network"
     if (run_type == "individual"):
         # Use this for individual test runs; the following "find_best_nn" is 
         # for complex runs
         epochs = 10
         model = Neural_Network(config, 1, 1)
         grid = GridSearchCV(estimator=model, param_grid=config)
-        grid_result = grid.fit(X_train_scaled, y_train)
-        print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+        grid_result = grid.fit(X_train, y_train)
+        print("Best: %f using %s" % (grid_result.best_score_, 
+                                     grid_result.best_params_))
         means = grid_result.cv_results_['mean_test_score']
         stds = grid_result.cv_results_['std_test_score']
         params = grid_result.cv_results_['params']
         for mean, stdev, param in zip(means, stds, params):
             print("%f (%f) with: %r" % (mean, stdev, param))
     elif (run_type == "neural_network"):
+        number_of_classes = 1
+        if (the_label == "Category"):
+            labels = pd.DataFrame()
+            label_to_predict = df.iloc[:,:1]
+            labels.insert(0, 'Category', label_to_predict)
+            df = df.select_dtypes(include=['number'])
+            unique_classes = labels['Category'].unique()
+            number_of_classes = len(unique_classes)
+        # end if
         # Instantiate neural network model and train it for a training set with 
         # a selection of hyperparameters. Save results of each run.
-        find_best_nn(config, train_loader, the_label)
+        find_best_nn(config, train_loader, the_label, number_of_classes)
     # end if
 # end if
 
